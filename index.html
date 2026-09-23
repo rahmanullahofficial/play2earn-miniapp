@@ -1,1 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Play2Earn</title>
 
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #0b1020;
+      color: #fff;
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    .app {
+      max-width: 600px;
+      margin: auto;
+      padding: 18px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      font-size: 23px;
+      font-weight: 800;
+    }
+
+    .logo span {
+      color: #6c63ff;
+    }
+
+    .profile {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #252d48;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .balance-card {
+      background: linear-gradient(135deg, #6258ff, #8b5cf6);
+      border-radius: 22px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 12px 30px rgba(98, 88, 255, .25);
+    }
+
+    .balance-label {
+      opacity: .85;
+      font-size: 14px;
+    }
+
+    .balance {
+      font-size: 36px;
+      font-weight: 800;
+      margin: 8px 0 18px;
+    }
+
+    .balance-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .earned {
+      font-size: 13px;
+      opacity: .9;
+    }
+
+    .withdraw-btn {
+      border: 0;
+      background: #fff;
+      color: #6258ff;
+      padding: 11px 17px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 24px 0 12px;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .quick {
+      background: #151c32;
+      border: 1px solid #222b45;
+      border-radius: 16px;
+      padding: 15px 5px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .quick-icon {
+      font-size: 25px;
+      margin-bottom: 7px;
+    }
+
+    .quick-text {
+      font-size: 11px;
+      color: #c8cee0;
+    }
+
+    .task {
+      background: #151c32;
+      border: 1px solid #222b45;
+      padding: 15px;
+      border-radius: 17px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-bottom: 10px;
+    }
+
+    .task-icon {
+      width: 45px;
+      height: 45px;
+      border-radius: 13px;
+      background: #202945;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .task-info {
+      flex: 1;
+    }
+
+    .task-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .reward {
+      color: #57e389;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .start-btn {
+      border: 0;
+      background: #6258ff;
+      color: white;
+      padding: 9px 13px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .streak {
+      background: #151c32;
+      border: 1px solid #222b45;
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
+      margin-top: 14px;
+    }
+
+    .day {
+      text-align: center;
+      background: #202945;
+      border-radius: 10px;
+      padding: 9px 2px;
+      font-size: 11px;
+    }
+
+    .day.active {
+      background: #6258ff;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 600px;
+      background: rgba(15, 20, 37, .97);
+      border-top: 1px solid #222b45;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 10px 5px;
+      z-index: 10;
+    }
+
+    .nav-item {
+      text-align: center;
+      color: #8d95ad;
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    .nav-icon {
+      display: block;
+      font-size: 21px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item.active {
+      color: #746cff;
+    }
+
+    @media (max-width: 380px) {
+      .quick-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .balance {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+
+    <div class="header">
+      <div class="logo">Play<span>2Earn</span></div>
+      <div class="profile">👤</div>
+    </div>
+
+    <div class="balance-card">
+      <div class="balance-label">Available Balance</div>
+
+      <div class="balance">$0.00</div>
+
+      <div class="balance-bottom">
+        <div class="earned">
+          Today's Earnings: <b>$0.00</b>
+        </div>
+
+        <button class="withdraw-btn" onclick="openWithdraw()">
+          Withdraw
+        </button>
+      </div>
+    </div>
+
+    <div class="section-title">Quick Actions</div>
+
+    <div class="quick-grid">
+
+      <div class="quick" onclick="showMessage('Tasks')">
+        <div class="quick-icon">🎯</div>
+        <div class="quick-text">Tasks</div>
+      </div>
+
+      <div class="quick" onclick="showMessage('Games')">
+        <div class="quick-icon">🎮</div>
+        <div class="quick-text">Games</div>
+      </div>
+
+      <div class="quick" onclick="showMessage('Referral')">
+        <div class="quick-icon">👥</div>
+        <div class="quick-text">Referral</div>
+      </div>
+
+      <div class="quick" onclick="showMessage('Daily Bonus')">
+        <div class="quick-icon">🎁</div>
+        <div class="quick-text">Daily Bonus</div>
+      </div>
+
+    </div>
+
+    <div class="section-title">Featured Tasks</div>
+
+    <div class="task">
+      <div class="task-icon">📱</div>
+
+      <div class="task-info">
+        <div class="task-title">Join Telegram Channel</div>
+        <div class="reward">+ $0.05</div>
+      </div>
+
+      <button class="start-btn" onclick="showMessage('Task started')">
+        Start
+      </button>
+    </div>
+
+    <div class="task">
+      <div class="task-icon">▶️</div>
+
+      <div class="task-info">
+        <div class="task-title">Watch Video</div>
+        <div class="reward">+ $0.10</div>
+      </div>
+
+      <button class="start-btn" onclick="showMessage('Task started')">
+        Start
+      </button>
+    </div>
+
+    <div class="section-title">🔥 Daily Streak</div>
+
+    <div class="streak">
+
+      <div>
+        Keep your streak alive and earn more rewards!
+      </div>
+
+      <div class="days">
+        <div class="day active">1<br>🔥</div>
+        <div class="day">2<br>🎁</div>
+        <div class="day">3<br>🎁</div>
+        <div class="day">4<br>🎁</div>
+        <div class="day">5<br>🎁</div>
+        <div class="day">6<br>🎁</div>
+        <div class="day">7<br>💎</div>
+      </div>
+
+    </div>
+
+    <div class="section-title">🏆 Leaderboard</div>
+
+    <div class="task">
+      <div class="task-icon">🥇</div>
+
+      <div class="task-info">
+        <div class="task-title">Top Earner</div>
+        <div class="reward">$0.00 earned</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-nav">
+
+    <div class="nav-item active">
+      <span class="nav-icon">🏠</span>
+      Home
+    </div>
+
+    <div class="nav-item">
+      <span class="nav-icon">🎯</span>
+      Tasks
+    </div>
+
+    <div class="nav-item">
+      <span class="nav-icon">🎮</span>
+      Games
+    </div>
+
+    <div class="nav-item">
+      <span class="nav-icon">👥</span>
+      Referral
+    </div>
+
+    <div class="nav-item">
+      <span class="nav-icon">👤</span>
+      Profile
+    </div>
+
+  </div>
+
+  <script>
+
+    const tg = window.Telegram.WebApp;
+
+    tg.ready();
+    tg.expand();
+
+    function showMessage(message) {
+      if (tg.showAlert) {
+        tg.showAlert(message);
+      } else {
+        alert(message);
+      }
+    }
+
+    function openWithdraw() {
+      showMessage("Withdraw system will be connected soon.");
+    }
+
+  </script>
+
+</body>
+</html>
