@@ -256,11 +256,11 @@
     <div class="balance-card">
       <div class="balance-label">Available Balance</div>
 
-      <div class="balance">$0.00</div>
+      <div class="balance" id="balance">$0.00</div>
 
       <div class="balance-bottom">
         <div class="earned">
-          Today's Earnings: <b>$0.00</b>
+          Total Earned: <b id="total-earned">$0.00</b>
         </div>
 
         <button class="withdraw-btn" onclick="openWithdraw()">
@@ -405,6 +405,56 @@
     }
 
   async function registerTelegramUser() {
+  const user = tg.initDataUnsafe?.user;
+
+  if (!user) {
+    console.log("Telegram user not available");
+    return;
+  }
+
+  try {
+    // Register user
+    const registerResponse = await fetch("/api/user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ user })
+    });
+
+    const registerData = await registerResponse.json();
+
+    if (!registerData.success) {
+      console.error(registerData.error);
+      return;
+    }
+
+    // Get latest user data
+    const response = await fetch(
+      "/api/user?telegram_id=" + encodeURIComponent(user.id)
+    );
+
+    const data = await response.json();
+
+    if (data.success) {
+      const balance = Number(data.user.balance || 0);
+      const totalEarned = Number(data.user.total_earned || 0);
+
+      document.getElementById("balance").textContent =
+        "$" + balance.toFixed(2);
+
+      document.getElementById("total-earned").textContent =
+        "$" + totalEarned.toFixed(2);
+
+      console.log("User data loaded:", data.user);
+    }
+
+  } catch (error) {
+    console.error("User loading error:", error);
+  }
+}
+
+registerTelegramUser(); {
   const user = tg.initDataUnsafe?.user;
 
   if (!user) {
