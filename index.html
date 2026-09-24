@@ -146,6 +146,7 @@
       align-items: center;
       justify-content: center;
       font-size: 22px;
+      flex-shrink: 0;
     }
 
     .task-info {
@@ -155,6 +156,12 @@
     .task-title {
       font-size: 14px;
       font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .task-description {
+      font-size: 11px;
+      color: #8d95ad;
       margin-bottom: 5px;
     }
 
@@ -172,6 +179,12 @@
       border-radius: 10px;
       font-size: 12px;
       font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .start-btn:active {
+      transform: scale(.96);
     }
 
     .streak {
@@ -297,29 +310,16 @@
 
     <div class="section-title">Featured Tasks</div>
 
-    <div class="task">
-      <div class="task-icon">📱</div>
+    <div id="task-list">
 
-      <div class="task-info">
-        <div class="task-title">Join Telegram Channel</div>
-        <div class="reward">+ $0.05</div>
+      <div class="task">
+        <div class="task-icon">⏳</div>
+
+        <div class="task-info">
+          <div class="task-title">Loading Tasks...</div>
+        </div>
       </div>
 
-      <button class="start-btn" onclick="showMessage('Task started')">
-        Start
-      </button>
-    </div>
-
-    <div id="task-list"></div>
-
-      <div class="task-info">
-        <div class="task-title">Watch Video</div>
-        <div class="reward">+ $0.10</div>
-      </div>
-
-      <button class="start-btn" onclick="showMessage('Task started')">
-        Start
-      </button>
     </div>
 
     <div class="section-title">🔥 Daily Streak</div>
@@ -357,27 +357,27 @@
 
   <div class="bottom-nav">
 
-    <div class="nav-item active">
+    <div class="nav-item active" onclick="showMessage('Home')">
       <span class="nav-icon">🏠</span>
       Home
     </div>
 
-    <div class="nav-item">
+    <div class="nav-item" onclick="showMessage('Tasks')">
       <span class="nav-icon">🎯</span>
       Tasks
     </div>
 
-    <div class="nav-item">
+    <div class="nav-item" onclick="showMessage('Games')">
       <span class="nav-icon">🎮</span>
       Games
     </div>
 
-    <div class="nav-item">
+    <div class="nav-item" onclick="showMessage('Referral')">
       <span class="nav-icon">👥</span>
       Referral
     </div>
 
-    <div class="nav-item">
+    <div class="nav-item" onclick="showMessage('Profile')">
       <span class="nav-icon">👤</span>
       Profile
     </div>
@@ -391,6 +391,8 @@
     tg.ready();
     tg.expand();
 
+
+    // Show Telegram message
     function showMessage(message) {
       if (tg.showAlert) {
         tg.showAlert(message);
@@ -399,198 +401,333 @@
       }
     }
 
+
+    // Withdraw
     function openWithdraw() {
       showMessage("Withdraw system will be connected soon.");
     }
 
-  async function registerTelegramUser() {
-  const user = tg.initDataUnsafe?.user;
 
-  if (!user) {
-    console.log("Telegram user not available");
-    return;
-  }
+    // Register Telegram user and load balance
+    async function registerTelegramUser() {
 
-  try {
-    // Register user
-    const registerResponse = await fetch("/api/user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ user })
-    });
+      const user = tg.initDataUnsafe?.user;
 
-    const registerData = await registerResponse.json();
-
-    if (!registerData.success) {
-      console.error(registerData.error);
-      return;
-    }
-
-    // Get latest user data
-    const response = await fetch(
-      "/api/user?telegram_id=" + encodeURIComponent(user.id)
-    );
-
-    const data = await response.json();
-
-    if (data.success) {
-      const balance = Number(data.user.balance || 0);
-      const totalEarned = Number(data.user.total_earned || 0);
-
-      document.getElementById("balance").textContent =
-        "$" + balance.toFixed(2);
-
-      document.getElementById("total-earned").textContent =
-        "$" + totalEarned.toFixed(2);
-
-      console.log("User data loaded:", data.user);
-    }
-
-  } catch (error) {
-    console.error("User loading error:", error);
-  }
-}
-
-registerTelegramUser(); {
-  const user = tg.initDataUnsafe?.user;
-
-  if (!user) {
-    console.log("Telegram user not available");
-    return;
-  }
-
-  try {
-    const response = await fetch("/api/user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ user })
-    });
-
-    const data = await response.json();
-
-    console.log("User registration:", data);
-
-    if (data.success) {
-      console.log("User saved successfully");
-    }
-  } catch (error) {
-    console.error("Registration error:", error);
-  }
-}
-
-registerTelegramUser();async function loadTasks() {
-  try {
-    const response = await fetch("/api/tasks");
-    const data = await response.json();
-
-    if (!data.success) {
-      console.error("Tasks error:", data.error);
-      return;
-    }
-
-    const tasksContainer = document.querySelector(".task-list");
-
-    if (!tasksContainer) {
-      console.log("Task container not found");
-      return;
-    }
-
-    tasksContainer.innerHTML = "";
-
-    data.tasks.forEach(task => {
-      const taskElement = document.createElement("div");
-
-      taskElement.className = "task-card";
-
-      taskElement.innerHTML = `
-        <div class="task-icon">${task.icon}</div>
-        <div class="task-info">
-          <h3>${task.title}</h3>
-          <p>${task.description || ""}</p>
-          <strong>+$${Number(task.reward).toFixed(2)}</strong>
-        </div>
-        <button onclick="openTask('${task.url}', ${task.id})">
-          Start
-        </button>
-      `;
-
-      tasksContainer.appendChild(taskElement);
-    });
-
-  } catch (error) {
-    console.error("Task loading error:", error);
-  }
-}
-
-async function startTask(taskId, url) {
-  const user = tg.initDataUnsafe?.user;
-
-  if (!user) {
-    showMessage("Telegram user not found");
-    return;
-  }
-
-  // Open task link first
-  if (url && url !== "#") {
-    window.open(url, "_blank");
-  }
-
-  // Wait before allowing completion
-  setTimeout(async () => {
-
-    const confirmComplete = confirm(
-      "Did you complete this task?"
-    );
-
-    if (!confirmComplete) {
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/tasks/complete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          telegram_id: user.id,
-          task_id: taskId
-        })
-      });
-
-      const data = await response.json();
-
-      if (!data.success) {
-        alert(data.error || "Task could not be completed");
+      if (!user) {
+        console.log("Telegram user not available");
         return;
       }
 
-      // Update balance
-      document.getElementById("balance").textContent =
-        "$" + Number(data.balance).toFixed(2);
+      try {
 
-      document.getElementById("total-earned").textContent =
-        "$" + Number(data.total_earned).toFixed(2);
+        const registerResponse = await fetch("/api/user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            user: user
+          })
+        });
 
-      alert(
-        "🎉 Task completed!\n\nReward: $" +
-        Number(data.reward).toFixed(3)
-      );
+        const registerData = await registerResponse.json();
 
-      loadTasks();
+        if (!registerData.success) {
+          console.error(
+            "Registration error:",
+            registerData.error
+          );
+          return;
+        }
 
-    } catch (error) {
-      console.error("Task completion error:", error);
-      alert("Something went wrong. Please try again.");
+
+        const response = await fetch(
+          "/api/user?telegram_id=" +
+          encodeURIComponent(user.id)
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+
+          const balance =
+            Number(data.user.balance || 0);
+
+          const totalEarned =
+            Number(data.user.total_earned || 0);
+
+
+          document.getElementById("balance").textContent =
+            "$" + balance.toFixed(2);
+
+
+          document.getElementById("total-earned").textContent =
+            "$" + totalEarned.toFixed(2);
+
+
+          console.log(
+            "User data loaded:",
+            data.user
+          );
+        }
+
+      } catch (error) {
+
+        console.error(
+          "User loading error:",
+          error
+        );
+
+      }
     }
 
-  }, 3000);
-}
-loadTasks();</script>
+
+    // Load tasks from database
+    async function loadTasks() {
+
+      try {
+
+        const response =
+          await fetch("/api/tasks");
+
+        const data =
+          await response.json();
+
+
+        if (!data.success) {
+
+          console.error(
+            "Tasks error:",
+            data.error
+          );
+
+          return;
+        }
+
+
+        const container =
+          document.getElementById("task-list");
+
+
+        if (!container) {
+          return;
+        }
+
+
+        container.innerHTML = "";
+
+
+        if (!data.tasks || data.tasks.length === 0) {
+
+          container.innerHTML = `
+            <div class="task">
+              <div class="task-icon">📭</div>
+              <div class="task-info">
+                <div class="task-title">
+                  No tasks available
+                </div>
+              </div>
+            </div>
+          `;
+
+          return;
+        }
+
+
+        data.tasks.forEach(task => {
+
+          const taskDiv =
+            document.createElement("div");
+
+          taskDiv.className = "task";
+
+
+          const reward =
+            Number(task.reward || 0);
+
+
+          taskDiv.innerHTML = `
+
+            <div class="task-icon">
+              ${task.icon || "🎯"}
+            </div>
+
+            <div class="task-info">
+
+              <div class="task-title">
+                ${task.title}
+              </div>
+
+              <div class="task-description">
+                ${task.description || ""}
+              </div>
+
+              <div class="reward">
+                + $${reward.toFixed(3)}
+              </div>
+
+            </div>
+
+            <button
+              class="start-btn"
+              onclick="startTask(${task.id}, '${task.url || "#"}')"
+            >
+              Start
+            </button>
+
+          `;
+
+
+          container.appendChild(taskDiv);
+
+        });
+
+
+      } catch (error) {
+
+        console.error(
+          "Task loading error:",
+          error
+        );
+
+      }
+    }
+
+
+    // Start task
+    async function startTask(taskId, url) {
+
+      const user =
+        tg.initDataUnsafe?.user;
+
+
+      if (!user) {
+
+        showMessage(
+          "Telegram user not found"
+        );
+
+        return;
+      }
+
+
+      // Open task link
+      if (url && url !== "#") {
+
+        window.open(
+          url,
+          "_blank"
+        );
+
+      }
+
+
+      // Wait 3 seconds
+      setTimeout(async () => {
+
+        const completed =
+          confirm(
+            "Did you complete this task?"
+          );
+
+
+        if (!completed) {
+          return;
+        }
+
+
+        try {
+
+          const response =
+            await fetch(
+              "/api/tasks/complete",
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body: JSON.stringify({
+                  telegram_id: user.id,
+                  task_id: taskId
+                })
+              }
+            );
+
+
+          const data =
+            await response.json();
+
+
+          if (!data.success) {
+
+            showMessage(
+              data.error ||
+              "Task could not be completed"
+            );
+
+            return;
+          }
+
+
+          // Update balance
+          document.getElementById(
+            "balance"
+          ).textContent =
+            "$" +
+            Number(
+              data.balance
+            ).toFixed(2);
+
+
+          // Update total earned
+          document.getElementById(
+            "total-earned"
+          ).textContent =
+            "$" +
+            Number(
+              data.total_earned
+            ).toFixed(2);
+
+
+          showMessage(
+            "🎉 Task completed!\n\nReward: $" +
+            Number(
+              data.reward
+            ).toFixed(3)
+          );
+
+
+          // Reload tasks
+          loadTasks();
+
+
+        } catch (error) {
+
+          console.error(
+            "Task completion error:",
+            error
+          );
+
+
+          showMessage(
+            "Something went wrong. Please try again."
+          );
+
+        }
+
+      }, 3000);
+
+    }
+
+
+    // Start app
+    registerTelegramUser();
+    loadTasks();
+
+  </script>
 
 </body>
 </html>
