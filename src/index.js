@@ -2,7 +2,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Telegram user registration
+    // Register Telegram user
     if (url.pathname === "/api/user" && request.method === "POST") {
       try {
         const data = await request.json();
@@ -17,7 +17,6 @@ export default {
 
         const telegramId = String(user.id);
 
-        // Check existing user
         const existing = await env.DB
           .prepare("SELECT * FROM users WHERE telegram_id = ?")
           .bind(telegramId)
@@ -54,10 +53,44 @@ export default {
 
       } catch (error) {
         return Response.json(
-          {
-            success: false,
-            error: error.message
-          },
+          { success: false, error: error.message },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Get user balance and profile
+    if (url.pathname === "/api/user" && request.method === "GET") {
+      try {
+        const telegramId = url.searchParams.get("telegram_id");
+
+        if (!telegramId) {
+          return Response.json(
+            { success: false, error: "telegram_id is required" },
+            { status: 400 }
+          );
+        }
+
+        const user = await env.DB
+          .prepare("SELECT * FROM users WHERE telegram_id = ?")
+          .bind(telegramId)
+          .first();
+
+        if (!user) {
+          return Response.json(
+            { success: false, error: "User not found" },
+            { status: 404 }
+          );
+        }
+
+        return Response.json({
+          success: true,
+          user
+        });
+
+      } catch (error) {
+        return Response.json(
+          { success: false, error: error.message },
           { status: 500 }
         );
       }
@@ -76,10 +109,10 @@ export default {
           result
         });
       } catch (error) {
-        return Response.json({
-          success: false,
-          error: error.message
-        }, { status: 500 });
+        return Response.json(
+          { success: false, error: error.message },
+          { status: 500 }
+        );
       }
     }
 
