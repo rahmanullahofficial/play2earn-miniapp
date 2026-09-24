@@ -57,42 +57,97 @@ export default {
           .first();
 
         if (!existing) {
+
+          /*
+            New referral code:
+            P2E + Telegram ID
+
+            Example:
+            P2E1813521459
+          */
+
           const referralCode =
-            "P2E" +
-            telegramId +
-            Math.random()
-              .toString(36)
-              .substring(2, 7)
-              .toUpperCase();
+            "P2E" + telegramId;
 
           let referredBy = null;
 
           /*
             Telegram Mini App start parameter.
+
             Example:
-            https://t.me/Play2Earn_Free_bot?startapp=REFCODE
+            https://t.me/Play2Earn_Free_bot?startapp=P2E1813521459
           */
+
           const startParam =
             String(data.start_param || "").trim();
 
-          if (
-            startParam &&
-            startParam !== referralCode
-          ) {
-            const referrer = await env.DB
-              .prepare(
-                "SELECT telegram_id FROM users WHERE referral_code = ?"
-              )
+          if (startParam) {
+
+            let referrer = null;
+
+            /*
+              First check the complete referral_code
+            */
+
+            referrer = await env.DB
+              .prepare(`
+                SELECT telegram_id
+                FROM users
+                WHERE referral_code = ?
+              `)
               .bind(startParam)
               .first();
+
+
+            /*
+              Also support referral links like:
+
+              P2E1813521459
+
+              This is useful for the new
+              simplified referral system.
+            */
+
+            if (
+              !referrer &&
+              startParam.startsWith("P2E")
+            ) {
+
+              const possibleTelegramId =
+                startParam.substring(3);
+
+              if (possibleTelegramId) {
+
+                referrer = await env.DB
+                  .prepare(`
+                    SELECT telegram_id
+                    FROM users
+                    WHERE telegram_id = ?
+                  `)
+                  .bind(possibleTelegramId)
+                  .first();
+
+              }
+            }
+
+
+            /*
+              Do not allow self-referral.
+            */
 
             if (
               referrer &&
               String(referrer.telegram_id) !== telegramId
             ) {
-              referredBy = String(referrer.telegram_id);
+              referredBy =
+                String(referrer.telegram_id);
             }
           }
+
+
+          /*
+            Create new user
+          */
 
           await env.DB
             .prepare(`
@@ -124,32 +179,50 @@ export default {
 
 
           /*
-            Give referral credit only once,
-            when a new user joins.
+            Give referral reward only once,
+            when a completely new user joins.
           */
 
           if (referredBy) {
+
             const referralReward = 0.01;
+
+
+            /*
+              Increase referrer's
+              referral count.
+            */
 
             await env.DB
               .prepare(`
                 UPDATE users
                 SET
-                  referrals_count = referrals_count + 1,
-                  updated_at = CURRENT_TIMESTAMP
+                  referrals_count =
+                    referrals_count + 1,
+                  updated_at =
+                    CURRENT_TIMESTAMP
                 WHERE telegram_id = ?
               `)
               .bind(referredBy)
               .run();
 
+
+            /*
+              Give $0.01 referral reward.
+            */
+
             await env.DB
               .prepare(`
                 UPDATE users
                 SET
-                  balance = balance + ?,
-                  total_earned = total_earned + ?,
-                  xp = xp + 10,
-                  updated_at = CURRENT_TIMESTAMP
+                  balance =
+                    balance + ?,
+                  total_earned =
+                    total_earned + ?,
+                  xp =
+                    xp + 10,
+                  updated_at =
+                    CURRENT_TIMESTAMP
                 WHERE telegram_id = ?
               `)
               .bind(
@@ -158,6 +231,21 @@ export default {
                 referredBy
               )
               .run();
+
+
+            /*
+              Update referrer's level.
+            */
+
+            await updateLevel(
+              env.DB,
+              referredBy
+            );
+
+
+            /*
+              Save referral transaction.
+            */
 
             await env.DB
               .prepare(`
@@ -177,7 +265,14 @@ export default {
               )
               .run();
           }
+
         } else {
+
+          /*
+            Existing user:
+            update Telegram profile information only.
+          */
+
           await env.DB
             .prepare(`
               UPDATE users
@@ -197,6 +292,11 @@ export default {
             .run();
         }
 
+
+        /*
+          Get final user data.
+        */
+
         const finalUser = await env.DB
           .prepare(
             "SELECT * FROM users WHERE telegram_id = ?"
@@ -210,6 +310,10 @@ export default {
         });
       }
 
+
+      // =========================
+      // API: GET USER
+      // =========================
 
       if (
         url.pathname === "/api/user" &&
@@ -693,11 +797,6 @@ export default {
           );
         }
 
-        /*
-          Small random reward.
-          This is intentionally low for the MVP.
-        */
-
         const rewards = [
           0.001,
           0.002,
@@ -1135,7 +1234,9 @@ export default {
       return json(
         {
           success: false,
-          error: error.message || "Server error"
+          error:
+            error.message ||
+            "Server error"
         },
         500
       );
@@ -1149,11 +1250,6 @@ export default {
 ========================================= */
 
 async function ensureDatabase(DB) {
-
-  /*
-    Existing tables are preserved.
-    New tables are created automatically.
-  */
 
   await DB.batch([
 
@@ -1249,10 +1345,6 @@ async function ensureDatabase(DB) {
   ]);
 
 
-  /*
-    Safe indexes.
-  */
-
   await DB.batch([
 
     DB.prepare(`
@@ -1285,11 +1377,6 @@ async function ensureDatabase(DB) {
 
   ]);
 
-
-  /*
-    Insert default tasks only if
-    there are no tasks yet.
-  */
 
   const taskCount =
     await DB
@@ -1400,10 +1487,6 @@ async function updateLevel(
 
   const xp =
     Number(user.xp || 0);
-
-  /*
-    Every 100 XP = next level.
-  */
 
   const level =
     Math.floor(xp / 100) + 1;
