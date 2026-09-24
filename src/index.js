@@ -59,33 +59,50 @@ export default {
       }
     }
 
-    // Get user balance and profile
+    // Get user
     if (url.pathname === "/api/user" && request.method === "GET") {
+      const telegramId = url.searchParams.get("telegram_id");
+
+      if (!telegramId) {
+        return Response.json(
+          { success: false, error: "telegram_id is required" },
+          { status: 400 }
+        );
+      }
+
+      const user = await env.DB
+        .prepare("SELECT * FROM users WHERE telegram_id = ?")
+        .bind(telegramId)
+        .first();
+
+      if (!user) {
+        return Response.json(
+          { success: false, error: "User not found" },
+          { status: 404 }
+        );
+      }
+
+      return Response.json({
+        success: true,
+        user
+      });
+    }
+
+    // Get active tasks
+    if (url.pathname === "/api/tasks" && request.method === "GET") {
       try {
-        const telegramId = url.searchParams.get("telegram_id");
-
-        if (!telegramId) {
-          return Response.json(
-            { success: false, error: "telegram_id is required" },
-            { status: 400 }
-          );
-        }
-
-        const user = await env.DB
-          .prepare("SELECT * FROM users WHERE telegram_id = ?")
-          .bind(telegramId)
-          .first();
-
-        if (!user) {
-          return Response.json(
-            { success: false, error: "User not found" },
-            { status: 404 }
-          );
-        }
+        const result = await env.DB
+          .prepare(`
+            SELECT id, title, description, reward, type, url, icon
+            FROM tasks
+            WHERE active = 1
+            ORDER BY id DESC
+          `)
+          .all();
 
         return Response.json({
           success: true,
-          user
+          tasks: result.results
         });
 
       } catch (error) {
@@ -98,22 +115,15 @@ export default {
 
     // Database test
     if (url.pathname === "/api/test") {
-      try {
-        const result = await env.DB
-          .prepare("SELECT 1 AS ok")
-          .first();
+      const result = await env.DB
+        .prepare("SELECT 1 AS ok")
+        .first();
 
-        return Response.json({
-          success: true,
-          database: "connected",
-          result
-        });
-      } catch (error) {
-        return Response.json(
-          { success: false, error: error.message },
-          { status: 500 }
-        );
-      }
+      return Response.json({
+        success: true,
+        database: "connected",
+        result
+      });
     }
 
     return env.ASSETS.fetch(request);
