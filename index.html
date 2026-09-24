@@ -301,9 +301,9 @@
         <div class="quick-text">Referral</div>
       </div>
 
-      <div class="quick" onclick="showMessage('Daily Bonus')">
-        <div class="quick-icon">🎁</div>
-        <div class="quick-text">Daily Bonus</div>
+      <div class="quick" onclick="claimDailyBonus()">
+  <div class="quick-icon">🎁</div>
+  <div class="quick-text">Daily Bonus</div>
       </div>
 
     </div>
@@ -403,7 +403,64 @@
 
 
     // Withdraw
-    function openWithdraw() {
+    function openWithdraw() async function claimDailyBonus() {
+
+  const user = tg.initDataUnsafe?.user;
+
+  if (!user) {
+    showMessage("Telegram user not found");
+    return;
+  }
+
+  try {
+
+    const response = await fetch("/api/daily-bonus", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        telegram_id: user.id
+      })
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+
+      showMessage(
+        data.error || "Daily bonus could not be claimed"
+      );
+
+      return;
+    }
+
+    // Update balance
+    document.getElementById("balance").textContent =
+      "$" + Number(data.balance).toFixed(2);
+
+    // Update total earned
+    document.getElementById("total-earned").textContent =
+      "$" + Number(data.total_earned).toFixed(2);
+
+    showMessage(
+      "🎉 Daily Bonus Claimed!\n\n" +
+      "Reward: $" +
+      Number(data.reward).toFixed(2)
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Daily bonus error:",
+      error
+    );
+
+    showMessage(
+      "Something went wrong. Please try again."
+    );
+  }
+    } {
       showMessage("Withdraw system will be connected soon.");
     }
 
