@@ -310,8 +310,7 @@
       </button>
     </div>
 
-    <div class="task">
-      <div class="task-icon">▶️</div>
+    <div id="task-list"></div>
 
       <div class="task-info">
         <div class="task-title">Watch Video</div>
@@ -483,7 +482,59 @@ registerTelegramUser(); {
   }
 }
 
-registerTelegramUser();</script>
+registerTelegramUser();async function loadTasks() {
+  try {
+    const response = await fetch("/api/tasks");
+    const data = await response.json();
+
+    if (!data.success) {
+      console.error("Tasks error:", data.error);
+      return;
+    }
+
+    const tasksContainer = document.querySelector(".task-list");
+
+    if (!tasksContainer) {
+      console.log("Task container not found");
+      return;
+    }
+
+    tasksContainer.innerHTML = "";
+
+    data.tasks.forEach(task => {
+      const taskElement = document.createElement("div");
+
+      taskElement.className = "task-card";
+
+      taskElement.innerHTML = `
+        <div class="task-icon">${task.icon}</div>
+        <div class="task-info">
+          <h3>${task.title}</h3>
+          <p>${task.description || ""}</p>
+          <strong>+$${Number(task.reward).toFixed(2)}</strong>
+        </div>
+        <button onclick="openTask('${task.url}', ${task.id})">
+          Start
+        </button>
+      `;
+
+      tasksContainer.appendChild(taskElement);
+    });
+
+  } catch (error) {
+    console.error("Task loading error:", error);
+  }
+}
+
+function openTask(url, taskId) {
+  if (url && url !== "#") {
+    window.open(url, "_blank");
+  }
+
+  console.log("Task started:", taskId);
+}
+
+loadTasks();</script>
 
 </body>
 </html>
