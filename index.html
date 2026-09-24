@@ -1222,4 +1222,1152 @@
     if (!user) {
 
       console.log(
-   
+        "Telegram user not available"
+      );
+
+      return;
+
+    }
+
+
+    currentUser = user;
+
+
+    try {
+
+      const registerResponse =
+        await fetch(
+          "/api/user",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              user: user,
+              start_param:
+                tg.initDataUnsafe.start_param || ""
+            })
+
+          }
+        );
+
+
+      const registerData =
+        await registerResponse.json();
+
+
+      if (!registerData.success) {
+
+        console.error(
+          registerData.error
+        );
+
+        return;
+
+      }
+
+
+      const response =
+        await fetch(
+          "/api/user?telegram_id=" +
+          encodeURIComponent(
+            user.id
+          )
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (
+        data.success &&
+        data.user
+      ) {
+
+        const u = data.user;
+
+
+        updateBalance(
+          u.balance,
+          u.total_earned
+        );
+
+
+        document.getElementById(
+          "profile-name"
+        ).textContent =
+          (
+            u.first_name ||
+            user.first_name ||
+            "User"
+          ) +
+          (
+            u.last_name
+              ? " " + u.last_name
+              : ""
+          );
+
+
+        document.getElementById(
+          "profile-username"
+        ).textContent =
+          u.username
+            ? "@" + u.username
+            : "Telegram User";
+
+
+        document.getElementById(
+          "profile-level"
+        ).textContent =
+          u.level || 1;
+
+
+        document.getElementById(
+          "profile-xp"
+        ).textContent =
+          u.xp || 0;
+
+
+        document.getElementById(
+          "profile-earned"
+        ).textContent =
+          "$" +
+          Number(
+            u.total_earned || 0
+          ).toFixed(2);
+
+
+        document.getElementById(
+          "profile-referrals"
+        ).textContent =
+          u.referrals_count || 0;
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        "User error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  /* LOAD TASKS */
+
+  async function loadTasks() {
+
+    const container =
+      document.getElementById(
+        "task-list"
+      );
+
+
+    if (!container) {
+      return;
+    }
+
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/tasks"
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.success) {
+
+        container.innerHTML = `
+          <div class="task">
+            <div class="task-icon">⚠️</div>
+            <div class="task-info">
+              <div class="task-title">
+                Could not load tasks
+              </div>
+            </div>
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      container.innerHTML = "";
+
+
+      if (
+        !data.tasks ||
+        data.tasks.length === 0
+      ) {
+
+        container.innerHTML = `
+          <div class="task">
+            <div class="task-icon">📭</div>
+            <div class="task-info">
+              <div class="task-title">
+                No tasks available
+              </div>
+            </div>
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      data.tasks.forEach(
+        function(task) {
+
+          const div =
+            document.createElement(
+              "div"
+            );
+
+
+          div.className =
+            "task";
+
+
+          const reward =
+            Number(
+              task.reward || 0
+            );
+
+
+          div.innerHTML = `
+
+            <div class="task-icon">
+              ${escapeHtml(
+                task.icon || "🎯"
+              )}
+            </div>
+
+            <div class="task-info">
+
+              <div class="task-title">
+                ${escapeHtml(task.title)}
+              </div>
+
+              <div class="task-description">
+                ${escapeHtml(
+                  task.description || ""
+                )}
+              </div>
+
+              <div class="reward">
+                + $${reward.toFixed(3)}
+              </div>
+
+            </div>
+
+            <button
+              class="start-btn"
+              onclick="startTask(
+                ${Number(task.id)},
+                '${String(
+                  task.url || "#"
+                ).replace(/'/g, "\\'")}'
+              )">
+
+              Start
+
+            </button>
+
+          `;
+
+
+          container.appendChild(
+            div
+          );
+
+        }
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Tasks error:",
+        error
+      );
+
+
+      container.innerHTML = `
+        <div class="task">
+          <div class="task-icon">⚠️</div>
+          <div class="task-info">
+            <div class="task-title">
+              Connection error
+            </div>
+          </div>
+        </div>
+      `;
+
+    }
+
+  }
+
+
+  /* ESCAPE HTML */
+
+  function escapeHtml(text) {
+
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  /* START TASK */
+
+  async function startTask(
+    taskId,
+    taskUrl
+  ) {
+
+    const user =
+      tg.initDataUnsafe &&
+      tg.initDataUnsafe.user;
+
+
+    if (!user) {
+
+      showMessage(
+        "Telegram user not found."
+      );
+
+      return;
+
+    }
+
+
+    if (
+      taskUrl &&
+      taskUrl !== "#"
+    ) {
+
+      try {
+
+        tg.openLink(taskUrl);
+
+      } catch (e) {
+
+        window.open(
+          taskUrl,
+          "_blank"
+        );
+
+      }
+
+    }
+
+
+    showMessage(
+      "Task started. Please complete it, then return here."
+    );
+
+
+    setTimeout(
+      async function() {
+
+        const confirmed =
+          confirm(
+            "Did you complete this task?"
+          );
+
+
+        if (!confirmed) {
+          return;
+        }
+
+
+        try {
+
+          const response =
+            await fetch(
+              "/api/tasks/complete",
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body: JSON.stringify({
+
+                  telegram_id:
+                    String(user.id),
+
+                  task_id:
+                    Number(taskId)
+
+                })
+
+              }
+            );
+
+
+          const data =
+            await response.json();
+
+
+          if (!data.success) {
+
+            showMessage(
+              data.error ||
+              "Task could not be completed."
+            );
+
+            return;
+
+          }
+
+
+          updateBalance(
+            data.balance,
+            data.total_earned
+          );
+
+
+          showMessage(
+            "🎉 Task completed!\n\n" +
+            "Reward: $" +
+            Number(
+              data.reward
+            ).toFixed(3)
+          );
+
+
+          loadTasks();
+
+        } catch (error) {
+
+          console.error(
+            "Complete task error:",
+            error
+          );
+
+
+          showMessage(
+            "Connection error. Please try again."
+          );
+
+        }
+
+      },
+      3000
+    );
+
+  }
+
+
+  /* DAILY BONUS */
+
+  async function claimDailyBonus() {
+
+    const user =
+      tg.initDataUnsafe &&
+      tg.initDataUnsafe.user;
+
+
+    if (!user) {
+
+      showMessage(
+        "Telegram user not found."
+      );
+
+      return;
+
+    }
+
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/daily-bonus",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+
+              telegram_id:
+                String(user.id)
+
+            })
+
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.success) {
+
+        showMessage(
+          data.error ||
+          "Daily bonus unavailable."
+        );
+
+        return;
+
+      }
+
+
+      updateBalance(
+        data.balance,
+        data.total_earned
+      );
+
+
+      showMessage(
+        "🎉 Daily Bonus Claimed!\n\n" +
+        "Reward: $" +
+        Number(
+          data.reward
+        ).toFixed(2)
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Daily bonus error:",
+        error
+      );
+
+
+      showMessage(
+        "Connection error. Please try again."
+      );
+
+    }
+
+  }
+
+
+  /* GAMES */
+
+  async function playSpin() {
+
+    playGame(
+      "spin",
+      "🎡"
+    );
+
+  }
+
+
+  async function playScratch() {
+
+    playGame(
+      "scratch",
+      "🎫"
+    );
+
+  }
+
+
+  async function playLucky() {
+
+    playGame(
+      "lucky",
+      "🍀"
+    );
+
+  }
+
+
+  async function playGame(
+    game,
+    icon
+  ) {
+
+    const user =
+      tg.initDataUnsafe &&
+      tg.initDataUnsafe.user;
+
+
+    if (!user) {
+
+      showMessage(
+        "Telegram user not found."
+      );
+
+      return;
+
+    }
+
+
+    const result =
+      document.getElementById(
+        "game-result"
+      );
+
+
+    result.innerHTML =
+      icon +
+      " Playing...";
+
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/game/play",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+
+              telegram_id:
+                String(user.id),
+
+              game:
+                game
+
+            })
+
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.success) {
+
+        result.textContent =
+          data.error ||
+          "Game unavailable.";
+
+        return;
+
+      }
+
+
+      result.innerHTML =
+        "🎉 You won $" +
+        Number(
+          data.reward || 0
+        ).toFixed(3);
+
+
+      updateBalance(
+        data.balance,
+        data.total_earned
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Game error:",
+        error
+      );
+
+
+      result.textContent =
+        "Connection error.";
+
+    }
+
+  }
+
+
+  /* REFERRAL */
+
+  async function loadReferral() {
+
+    const user =
+      tg.initDataUnsafe &&
+      tg.initDataUnsafe.user;
+
+
+    if (!user) {
+      return;
+    }
+
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/referral?telegram_id=" +
+          encodeURIComponent(
+            user.id
+          )
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (
+        data.success &&
+        data.referral
+      ) {
+
+        document.getElementById(
+          "referral-link"
+        ).textContent =
+          data.referral.link;
+
+
+        document.getElementById(
+          "referrals-count"
+        ).textContent =
+          data.referral.referrals_count || 0;
+
+
+        document.getElementById(
+          "referral-earned"
+        ).textContent =
+          "$" +
+          Number(
+            data.referral.earned || 0
+          ).toFixed(2);
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        "Referral error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  async function copyReferral() {
+
+    const text =
+      document.getElementById(
+        "referral-link"
+      ).textContent;
+
+
+    if (
+      !text ||
+      text === "Loading..."
+    ) {
+
+      showMessage(
+        "Referral link is not ready yet."
+      );
+
+      return;
+
+    }
+
+
+    try {
+
+      await navigator.clipboard.writeText(
+        text
+      );
+
+
+      showMessage(
+        "✅ Referral link copied!"
+      );
+
+    } catch (error) {
+
+      showMessage(
+        text
+      );
+
+    }
+
+  }
+
+
+  /* WITHDRAW */
+
+  async function submitWithdraw() {
+
+    const user =
+      tg.initDataUnsafe &&
+      tg.initDataUnsafe.user;
+
+
+    if (!user) {
+
+      showMessage(
+        "Telegram user not found."
+      );
+
+      return;
+
+    }
+
+
+    const amount =
+      Number(
+        document.getElementById(
+          "withdraw-amount"
+        ).value
+      );
+
+
+    const method =
+      document.getElementById(
+        "withdraw-method"
+      ).value.trim();
+
+
+    const account =
+      document.getElementById(
+        "withdraw-account"
+      ).value.trim();
+
+
+    if (
+      !amount ||
+      amount <= 0
+    ) {
+
+      showMessage(
+        "Please enter a valid amount."
+      );
+
+      return;
+
+    }
+
+
+    if (!method || !account) {
+
+      showMessage(
+        "Please enter payment method and account."
+      );
+
+      return;
+
+    }
+
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/withdraw",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+
+              telegram_id:
+                String(user.id),
+
+              amount:
+                amount,
+
+              method:
+                method,
+
+              account:
+                account
+
+            })
+
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.success) {
+
+        showMessage(
+          data.error ||
+          "Withdrawal failed."
+        );
+
+        return;
+
+      }
+
+
+      updateBalance(
+        data.balance,
+        data.total_earned
+      );
+
+
+      document.getElementById(
+        "withdraw-amount"
+      ).value = "";
+
+
+      document.getElementById(
+        "withdraw-method"
+      ).value = "";
+
+
+      document.getElementById(
+        "withdraw-account"
+      ).value = "";
+
+
+      showMessage(
+        "✅ Withdrawal request submitted!"
+      );
+
+
+      loadWithdrawHistory();
+
+    } catch (error) {
+
+      console.error(
+        "Withdraw error:",
+        error
+      );
+
+
+      showMessage(
+        "Connection error. Please try again."
+      );
+
+    }
+
+  }
+
+
+  async function loadWithdrawHistory() {
+
+    const container =
+      document.getElementById(
+        "withdraw-history"
+      );
+
+
+    const user =
+      tg.initDataUnsafe &&
+      tg.initDataUnsafe.user;
+
+
+    if (
+      !container ||
+      !user
+    ) {
+
+      return;
+
+    }
+
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/withdraw/history?telegram_id=" +
+          encodeURIComponent(
+            user.id
+          )
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (
+        !data.success ||
+        !data.withdrawals ||
+        data.withdrawals.length === 0
+      ) {
+
+        container.innerHTML = `
+          <div class="loading">
+            No withdrawal history yet.
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      container.innerHTML = "";
+
+
+      data.withdrawals.forEach(
+        function(item) {
+
+          const div =
+            document.createElement(
+              "div"
+            );
+
+
+          div.className =
+            "history-item";
+
+
+          div.innerHTML = `
+
+            <div>
+
+              <div class="history-title">
+                Withdrawal $${Number(
+                  item.amount || 0
+                ).toFixed(2)}
+              </div>
+
+              <div class="history-date">
+                ${escapeHtml(
+                  item.method || ""
+                )}
+              </div>
+
+            </div>
+
+            <div class="status">
+              ${escapeHtml(
+                item.status || "pending"
+              )}
+            </div>
+
+          `;
+
+
+          container.appendChild(
+            div
+          );
+
+        }
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "History error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  /* PROFILE */
+
+  function updateProfile() {
+
+    if (!currentUser) {
+      return;
+    }
+
+
+    document.getElementById(
+      "profile-name"
+    ).textContent =
+      (
+        currentUser.first_name ||
+        "User"
+      ) +
+      (
+        currentUser.last_name
+          ? " " + currentUser.last_name
+          : ""
+      );
+
+
+    document.getElementById(
+      "profile-username"
+    ).textContent =
+      currentUser.username
+        ? "@" + currentUser.username
+        : "Telegram User";
+
+  }
+
+
+  /* HOME TASK SCROLL */
+
+  function scrollToTasks() {
+
+    showPage("home-page");
+
+
+    setTimeout(
+      function() {
+
+        const section =
+          document.getElementById(
+            "tasks-section"
+          );
+
+
+        if (section) {
+
+          section.scrollIntoView({
+            behavior: "smooth"
+          });
+
+        }
+
+      },
+      100
+    );
+
+  }
+
+
+  /* START */
+
+  loadUser();
+
+  loadTasks();
+
+</script>
+
+</body>
+</html>
