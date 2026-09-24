@@ -52,6 +52,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      cursor: pointer;
     }
 
     .balance-card {
@@ -89,6 +90,7 @@
       padding: 10px 15px;
       border-radius: 10px;
       font-weight: 700;
+      cursor: pointer;
     }
 
     .section-title {
@@ -181,7 +183,8 @@
 
     .start-btn:active,
     .quick:active,
-    .withdraw-btn:active {
+    .withdraw-btn:active,
+    .profile:active {
       transform: scale(.96);
     }
 
@@ -249,6 +252,219 @@
       color: #8d95ad;
     }
 
+    /* EXTRA CONTENT - SAME DESIGN */
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .back-btn {
+      border: none;
+      background: #151c32;
+      color: white;
+      border: 1px solid #222b45;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      cursor: pointer;
+    }
+
+    .feature-card {
+      background: #151c32;
+      border: 1px solid #222b45;
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 12px;
+    }
+
+    .feature-card h3 {
+      font-size: 16px;
+      margin-bottom: 7px;
+    }
+
+    .feature-card p {
+      color: #8d95ad;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .game-card {
+      background: #151c32;
+      border: 1px solid #222b45;
+      border-radius: 17px;
+      padding: 20px 10px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .game-icon {
+      font-size: 35px;
+      margin-bottom: 10px;
+    }
+
+    .game-title {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .game-reward {
+      color: #57e389;
+      font-size: 11px;
+      margin-top: 5px;
+    }
+
+    .referral-box {
+      background: #151c32;
+      border: 1px solid #222b45;
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .referral-link {
+      background: #202945;
+      padding: 13px;
+      border-radius: 11px;
+      margin: 12px 0;
+      font-size: 11px;
+      word-break: break-all;
+      color: #c8cee0;
+    }
+
+    .primary-btn {
+      width: 100%;
+      border: none;
+      background: #6258ff;
+      color: white;
+      padding: 12px;
+      border-radius: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .input {
+      width: 100%;
+      background: #202945;
+      color: white;
+      border: 1px solid #2b3657;
+      border-radius: 11px;
+      padding: 13px;
+      outline: none;
+      margin: 8px 0;
+    }
+
+    .input::placeholder {
+      color: #8d95ad;
+    }
+
+    .history-item {
+      background: #151c32;
+      border: 1px solid #222b45;
+      border-radius: 15px;
+      padding: 14px;
+      margin-bottom: 9px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .history-title {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .history-date {
+      color: #8d95ad;
+      font-size: 10px;
+      margin-top: 5px;
+    }
+
+    .status {
+      font-size: 11px;
+      color: #57e389;
+      white-space: nowrap;
+    }
+
+    .profile-card {
+      background: #151c32;
+      border: 1px solid #222b45;
+      border-radius: 18px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .profile-avatar {
+      width: 65px;
+      height: 65px;
+      background: #252d48;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 32px;
+      margin: 0 auto 12px;
+    }
+
+    .profile-name {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .profile-username {
+      color: #8d95ad;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .stat {
+      background: #202945;
+      padding: 14px;
+      border-radius: 12px;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .stat-label {
+      color: #8d95ad;
+      font-size: 10px;
+      margin-top: 4px;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .big-game-icon {
+      font-size: 65px;
+      margin: 15px;
+    }
+
+    .game-result {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 15px 0;
+      min-height: 25px;
+    }
+
     @media (max-width: 380px) {
       .quick-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -265,151 +481,368 @@
 
 <div class="app">
 
-  <div class="header">
-    <div class="logo">Play<span>2Earn</span></div>
-    <div class="profile">👤</div>
+  <!-- HOME PAGE -->
+
+  <div id="home-page" class="page active">
+
+    <div class="header">
+      <div class="logo">Play<span>2Earn</span></div>
+
+      <div class="profile" onclick="openProfile()">
+        👤
+      </div>
+    </div>
+
+
+    <!-- BALANCE -->
+
+    <div class="balance-card">
+
+      <div class="balance-label">
+        Available Balance
+      </div>
+
+      <div class="balance" id="balance">
+        $0.00
+      </div>
+
+      <div class="balance-bottom">
+
+        <div class="earned">
+          Total Earned:
+          <b id="total-earned">$0.00</b>
+        </div>
+
+        <button
+          class="withdraw-btn"
+          onclick="openWithdraw()">
+          Withdraw
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- QUICK ACTIONS -->
+
+    <div class="section-title">
+      Quick Actions
+    </div>
+
+    <div class="quick-grid">
+
+      <div class="quick" onclick="scrollToTasks()">
+        <div class="quick-icon">🎯</div>
+        <div class="quick-text">Tasks</div>
+      </div>
+
+      <div class="quick" onclick="openGames()">
+        <div class="quick-icon">🎮</div>
+        <div class="quick-text">Games</div>
+      </div>
+
+      <div class="quick" onclick="openReferral()">
+        <div class="quick-icon">👥</div>
+        <div class="quick-text">Referral</div>
+      </div>
+
+      <div class="quick" onclick="claimDailyBonus()">
+        <div class="quick-icon">🎁</div>
+        <div class="quick-text">Daily Bonus</div>
+      </div>
+
+    </div>
+
+
+    <!-- TASKS -->
+
+    <div
+      class="section-title"
+      id="tasks-section">
+
+      Featured Tasks
+
+    </div>
+
+    <div id="task-list">
+
+      <div class="loading">
+        Loading Tasks...
+      </div>
+
+    </div>
+
+
+    <!-- STREAK -->
+
+    <div class="section-title">
+      🔥 Daily Streak
+    </div>
+
+    <div class="streak">
+
+      <div>
+        Keep your streak alive and earn more rewards!
+      </div>
+
+      <div class="days">
+
+        <div class="day active">
+          1<br>🔥
+        </div>
+
+        <div class="day">
+          2<br>🎁
+        </div>
+
+        <div class="day">
+          3<br>🎁
+        </div>
+
+        <div class="day">
+          4<br>🎁
+        </div>
+
+        <div class="day">
+          5<br>🎁
+        </div>
+
+        <div class="day">
+          6<br>🎁
+        </div>
+
+        <div class="day">
+          7<br>💎
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- LEADERBOARD -->
+
+    <div class="section-title">
+      🏆 Leaderboard
+    </div>
+
+    <div id="leaderboard-list">
+
+      <div class="task">
+
+        <div class="task-icon">
+          🥇
+        </div>
+
+        <div class="task-info">
+
+          <div class="task-title">
+            Top Earner
+          </div>
+
+          <div class="reward">
+            $0.00 earned
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
 
 
-  <!-- BALANCE -->
+  <!-- GAMES PAGE -->
 
-  <div class="balance-card">
+  <div id="games-page" class="page">
 
-    <div class="balance-label">
-      Available Balance
+    <button class="back-btn" onclick="showPage('home-page')">
+      ← Back
+    </button>
+
+    <div class="section-title">
+      🎮 Games
     </div>
 
-    <div class="balance" id="balance">
-      $0.00
+    <div class="game-grid">
+
+      <div class="game-card" onclick="playSpin()">
+        <div class="game-icon">🎡</div>
+        <div class="game-title">Spin & Earn</div>
+        <div class="game-reward">Daily Chance</div>
+      </div>
+
+      <div class="game-card" onclick="playScratch()">
+        <div class="game-icon">🎫</div>
+        <div class="game-title">Scratch Card</div>
+        <div class="game-reward">Win Rewards</div>
+      </div>
+
+      <div class="game-card" onclick="playLucky()">
+        <div class="game-icon">🍀</div>
+        <div class="game-title">Lucky Number</div>
+        <div class="game-reward">Pick & Win</div>
+      </div>
+
+      <div class="game-card" onclick="claimDailyBonus()">
+        <div class="game-icon">🎁</div>
+        <div class="game-title">Daily Bonus</div>
+        <div class="game-reward">Daily Reward</div>
+      </div>
+
     </div>
 
-    <div class="balance-bottom">
+    <div id="game-result" class="game-result center"></div>
 
-      <div class="earned">
-        Total Earned:
-        <b id="total-earned">$0.00</b>
+  </div>
+
+
+  <!-- REFERRAL PAGE -->
+
+  <div id="referral-page" class="page">
+
+    <button class="back-btn" onclick="showPage('home-page')">
+      ← Back
+    </button>
+
+    <div class="section-title">
+      👥 Referral
+    </div>
+
+    <div class="referral-box">
+
+      <div class="feature-card">
+
+        <h3>
+          Invite Friends & Earn
+        </h3>
+
+        <p>
+          Invite your friends to Play2Earn and earn referral rewards.
+        </p>
+
+      </div>
+
+      <div>
+        Your Referral Link
+      </div>
+
+      <div
+        class="referral-link"
+        id="referral-link">
+
+        Loading...
+
       </div>
 
       <button
-        class="withdraw-btn"
-        onclick="openWithdraw()">
-        Withdraw
+        class="primary-btn"
+        onclick="copyReferral()">
+
+        Copy Referral Link
+
+      </button>
+
+      <div class="stats-grid">
+
+        <div class="stat">
+          <div
+            class="stat-value"
+            id="referrals-count">
+            0
+          </div>
+
+          <div class="stat-label">
+            Referrals
+          </div>
+        </div>
+
+        <div class="stat">
+          <div
+            class="stat-value"
+            id="referral-earned">
+            $0.00
+          </div>
+
+          <div class="stat-label">
+            Referral Earned
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- WITHDRAW PAGE -->
+
+  <div id="withdraw-page" class="page">
+
+    <button class="back-btn" onclick="showPage('home-page')">
+      ← Back
+    </button>
+
+    <div class="section-title">
+      💸 Withdraw
+    </div>
+
+    <div class="feature-card">
+
+      <h3>
+        Available Balance
+      </h3>
+
+      <div
+        class="balance"
+        id="withdraw-balance">
+        $0.00
+      </div>
+
+      <p>
+        Enter the amount and your payment details.
+      </p>
+
+      <input
+        class="input"
+        id="withdraw-amount"
+        type="number"
+        min="0"
+        step="0.001"
+        placeholder="Amount">
+
+      <input
+        class="input"
+        id="withdraw-method"
+        placeholder="Payment method e.g. PayPal">
+
+      <input
+        class="input"
+        id="withdraw-account"
+        placeholder="Payment account / address">
+
+      <button
+        class="primary-btn"
+        onclick="submitWithdraw()">
+
+        Submit Withdrawal
+
       </button>
 
     </div>
 
-  </div>
 
-
-  <!-- QUICK ACTIONS -->
-
-  <div class="section-title">
-    Quick Actions
-  </div>
-
-  <div class="quick-grid">
-
-    <div
-      class="quick"
-      onclick="scrollToTasks()">
-
-      <div class="quick-icon">🎯</div>
-      <div class="quick-text">Tasks</div>
-
+    <div class="section-title">
+      Withdrawal History
     </div>
 
+    <div id="withdraw-history">
 
-    <div
-      class="quick"
-      onclick="showMessage('Games coming soon 🎮')">
-
-      <div class="quick-icon">🎮</div>
-      <div class="quick-text">Games</div>
-
-    </div>
-
-
-    <div
-      class="quick"
-      onclick="showMessage('Referral system coming soon 👥')">
-
-      <div class="quick-icon">👥</div>
-      <div class="quick-text">Referral</div>
-
-    </div>
-
-
-    <div
-      class="quick"
-      onclick="claimDailyBonus()">
-
-      <div class="quick-icon">🎁</div>
-      <div class="quick-text">Daily Bonus</div>
-
-    </div>
-
-  </div>
-
-
-  <!-- TASKS -->
-
-  <div
-    class="section-title"
-    id="tasks-section">
-
-    Featured Tasks
-
-  </div>
-
-  <div id="task-list">
-
-    <div class="loading">
-      Loading Tasks...
-    </div>
-
-  </div>
-
-
-  <!-- STREAK -->
-
-  <div class="section-title">
-    🔥 Daily Streak
-  </div>
-
-  <div class="streak">
-
-    <div>
-      Keep your streak alive and earn more rewards!
-    </div>
-
-    <div class="days">
-
-      <div class="day active">
-        1<br>🔥
-      </div>
-
-      <div class="day">
-        2<br>🎁
-      </div>
-
-      <div class="day">
-        3<br>🎁
-      </div>
-
-      <div class="day">
-        4<br>🎁
-      </div>
-
-      <div class="day">
-        5<br>🎁
-      </div>
-
-      <div class="day">
-        6<br>🎁
-      </div>
-
-      <div class="day">
-        7<br>💎
+      <div class="loading">
+        Loading...
       </div>
 
     </div>
@@ -417,26 +850,94 @@
   </div>
 
 
-  <!-- LEADERBOARD -->
+  <!-- PROFILE PAGE -->
 
-  <div class="section-title">
-    🏆 Leaderboard
-  </div>
+  <div id="profile-page" class="page">
 
-  <div class="task">
+    <button class="back-btn" onclick="showPage('home-page')">
+      ← Back
+    </button>
 
-    <div class="task-icon">
-      🥇
+    <div class="section-title">
+      👤 Profile
     </div>
 
-    <div class="task-info">
+    <div class="profile-card">
 
-      <div class="task-title">
-        Top Earner
+      <div class="profile-avatar">
+        👤
       </div>
 
-      <div class="reward">
-        $0.00 earned
+      <div
+        class="profile-name"
+        id="profile-name">
+        User
+      </div>
+
+      <div
+        class="profile-username"
+        id="profile-username">
+        @username
+      </div>
+
+      <div class="stats-grid">
+
+        <div class="stat">
+
+          <div
+            class="stat-value"
+            id="profile-level">
+            1
+          </div>
+
+          <div class="stat-label">
+            Level
+          </div>
+
+        </div>
+
+        <div class="stat">
+
+          <div
+            class="stat-value"
+            id="profile-xp">
+            0
+          </div>
+
+          <div class="stat-label">
+            XP
+          </div>
+
+        </div>
+
+        <div class="stat">
+
+          <div
+            class="stat-value"
+            id="profile-earned">
+            $0.00
+          </div>
+
+          <div class="stat-label">
+            Total Earned
+          </div>
+
+        </div>
+
+        <div class="stat">
+
+          <div
+            class="stat-value"
+            id="profile-referrals">
+            0
+          </div>
+
+          <div class="stat-label">
+            Referrals
+          </div>
+
+        </div>
+
       </div>
 
     </div>
@@ -452,47 +953,48 @@
 
   <div
     class="nav-item active"
-    onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    id="nav-home"
+    onclick="showPage('home-page')">
 
     <span class="nav-icon">🏠</span>
     Home
 
   </div>
 
-
   <div
     class="nav-item"
-    onclick="scrollToTasks()">
+    id="nav-tasks"
+    onclick="showPage('home-page'); setTimeout(scrollToTasks,100)">
 
     <span class="nav-icon">🎯</span>
     Tasks
 
   </div>
 
-
   <div
     class="nav-item"
-    onclick="showMessage('Games coming soon 🎮')">
+    id="nav-games"
+    onclick="openGames()">
 
     <span class="nav-icon">🎮</span>
     Games
 
   </div>
 
-
   <div
     class="nav-item"
-    onclick="showMessage('Referral system coming soon 👥')">
+    id="nav-referral"
+    onclick="openReferral()">
 
     <span class="nav-icon">👥</span>
     Referral
 
   </div>
 
-
   <div
     class="nav-item"
-    onclick="showMessage('Profile coming soon 👤')">
+    id="nav-profile"
+    onclick="openProfile()">
 
     <span class="nav-icon">👤</span>
     Profile
@@ -510,7 +1012,10 @@
   tg.expand();
 
 
-  // MESSAGE
+  let currentUser = null;
+
+
+  /* MESSAGE */
 
   function showMessage(message) {
 
@@ -530,38 +1035,182 @@
   }
 
 
-  // WITHDRAW
+  /* PAGE SYSTEM */
 
-  function openWithdraw() {
+  function showPage(pageId) {
 
-    showMessage(
-      "Withdraw system will be connected soon."
-    );
+    document
+      .querySelectorAll(".page")
+      .forEach(function(page) {
 
-  }
+        page.classList.remove("active");
 
-
-  // SCROLL TO TASKS
-
-  function scrollToTasks() {
-
-    const section =
-      document.getElementById(
-        "tasks-section"
-      );
-
-    if (section) {
-
-      section.scrollIntoView({
-        behavior: "smooth"
       });
+
+
+    const page =
+      document.getElementById(pageId);
+
+
+    if (page) {
+
+      page.classList.add("active");
+
+    }
+
+
+    updateNavigation(pageId);
+
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+
+    if (pageId === "withdraw-page") {
+
+      loadWithdrawHistory();
+
+    }
+
+
+    if (pageId === "referral-page") {
+
+      loadReferral();
+
+    }
+
+
+    if (pageId === "profile-page") {
+
+      updateProfile();
 
     }
 
   }
 
 
-  // LOAD USER
+  function updateNavigation(pageId) {
+
+    document
+      .querySelectorAll(".nav-item")
+      .forEach(function(item) {
+
+        item.classList.remove("active");
+
+      });
+
+
+    if (pageId === "home-page") {
+
+      document
+        .getElementById("nav-home")
+        .classList.add("active");
+
+    }
+
+    if (pageId === "games-page") {
+
+      document
+        .getElementById("nav-games")
+        .classList.add("active");
+
+    }
+
+    if (pageId === "referral-page") {
+
+      document
+        .getElementById("nav-referral")
+        .classList.add("active");
+
+    }
+
+    if (pageId === "profile-page") {
+
+      document
+        .getElementById("nav-profile")
+        .classList.add("active");
+
+    }
+
+  }
+
+
+  /* OPEN PAGES */
+
+  function openGames() {
+
+    showPage("games-page");
+
+  }
+
+
+  function openReferral() {
+
+    showPage("referral-page");
+
+  }
+
+
+  function openProfile() {
+
+    showPage("profile-page");
+
+  }
+
+
+  function openWithdraw() {
+
+    updateWithdrawBalance();
+
+    showPage("withdraw-page");
+
+  }
+
+
+  /* UPDATE BALANCE */
+
+  function updateBalance(balance, totalEarned) {
+
+    document.getElementById(
+      "balance"
+    ).textContent =
+      "$" +
+      Number(balance || 0).toFixed(2);
+
+
+    document.getElementById(
+      "total-earned"
+    ).textContent =
+      "$" +
+      Number(totalEarned || 0).toFixed(2);
+
+
+    document.getElementById(
+      "withdraw-balance"
+    ).textContent =
+      "$" +
+      Number(balance || 0).toFixed(2);
+
+  }
+
+
+  function updateWithdrawBalance() {
+
+    const text =
+      document.getElementById(
+        "balance"
+      ).textContent;
+
+    document.getElementById(
+      "withdraw-balance"
+    ).textContent = text;
+
+  }
+
+
+  /* LOAD USER */
 
   async function loadUser() {
 
@@ -569,562 +1218,8 @@
       tg.initDataUnsafe &&
       tg.initDataUnsafe.user;
 
+
     if (!user) {
 
       console.log(
-        "Telegram user not available"
-      );
-
-      return;
-
-    }
-
-
-    try {
-
-      // Register
-
-      const registerResponse =
-        await fetch(
-          "/api/user",
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-
-            body: JSON.stringify({
-              user: user
-            })
-          }
-        );
-
-
-      const registerData =
-        await registerResponse.json();
-
-
-      if (!registerData.success) {
-
-        console.error(
-          registerData.error
-        );
-
-        return;
-
-      }
-
-
-      // Get user
-
-      const response =
-        await fetch(
-          "/api/user?telegram_id=" +
-          encodeURIComponent(
-            user.id
-          )
-        );
-
-
-      const data =
-        await response.json();
-
-
-      if (
-        data.success &&
-        data.user
-      ) {
-
-        document.getElementById(
-          "balance"
-        ).textContent =
-          "$" +
-          Number(
-            data.user.balance || 0
-          ).toFixed(2);
-
-
-        document.getElementById(
-          "total-earned"
-        ).textContent =
-          "$" +
-          Number(
-            data.user.total_earned || 0
-          ).toFixed(2);
-
-      }
-
-    } catch (error) {
-
-      console.error(
-        "User error:",
-        error
-      );
-
-    }
-
-  }
-
-
-  // LOAD TASKS
-
-  async function loadTasks() {
-
-    const container =
-      document.getElementById(
-        "task-list"
-      );
-
-
-    if (!container) {
-      return;
-    }
-
-
-    try {
-
-      const response =
-        await fetch(
-          "/api/tasks"
-        );
-
-
-      const data =
-        await response.json();
-
-
-      console.log(
-        "Tasks API:",
-        data
-      );
-
-
-      if (
-        !data.success
-      ) {
-
-        container.innerHTML = `
-          <div class="task">
-            <div class="task-icon">⚠️</div>
-            <div class="task-info">
-              <div class="task-title">
-                Could not load tasks
-              </div>
-            </div>
-          </div>
-        `;
-
-        return;
-
-      }
-
-
-      container.innerHTML = "";
-
-
-      if (
-        !data.tasks ||
-        data.tasks.length === 0
-      ) {
-
-        container.innerHTML = `
-          <div class="task">
-            <div class="task-icon">📭</div>
-            <div class="task-info">
-              <div class="task-title">
-                No tasks available
-              </div>
-            </div>
-          </div>
-        `;
-
-        return;
-
-      }
-
-
-      data.tasks.forEach(
-        function(task) {
-
-          const div =
-            document.createElement(
-              "div"
-            );
-
-
-          div.className =
-            "task";
-
-
-          const reward =
-            Number(
-              task.reward || 0
-            );
-
-
-          div.innerHTML = `
-
-            <div class="task-icon">
-              ${task.icon || "🎯"}
-            </div>
-
-            <div class="task-info">
-
-              <div class="task-title">
-                ${escapeHtml(task.title)}
-              </div>
-
-              <div class="task-description">
-                ${escapeHtml(
-                  task.description || ""
-                )}
-              </div>
-
-              <div class="reward">
-                + $${reward.toFixed(3)}
-              </div>
-
-            </div>
-
-            <button
-              class="start-btn"
-              onclick="startTask(
-                ${Number(task.id)},
-                '${String(
-                  task.url || "#"
-                ).replace(/'/g, "\\'")}'
-              )">
-
-              Start
-
-            </button>
-
-          `;
-
-
-          container.appendChild(
-            div
-          );
-
-        }
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        "Tasks error:",
-        error
-      );
-
-
-      container.innerHTML = `
-        <div class="task">
-          <div class="task-icon">⚠️</div>
-          <div class="task-info">
-            <div class="task-title">
-              Connection error
-            </div>
-          </div>
-        </div>
-      `;
-
-    }
-
-  }
-
-
-  // SAFE TEXT
-
-  function escapeHtml(text) {
-
-    return String(text)
-      .replace(
-        /&/g,
-        "&amp;"
-      )
-      .replace(
-        /</g,
-        "&lt;"
-      )
-      .replace(
-        />/g,
-        "&gt;"
-      )
-      .replace(
-        /"/g,
-        "&quot;"
-      )
-      .replace(
-        /'/g,
-        "&#039;"
-      );
-
-  }
-
-
-  // COMPLETE TASK
-
-  async function startTask(
-    taskId,
-    taskUrl
-  ) {
-
-    const user =
-      tg.initDataUnsafe &&
-      tg.initDataUnsafe.user;
-
-
-    if (!user) {
-
-      showMessage(
-        "Telegram user not found."
-      );
-
-      return;
-
-    }
-
-
-    // For now task URLs are #
-    if (
-      taskUrl &&
-      taskUrl !== "#"
-    ) {
-
-      window.open(
-        taskUrl,
-        "_blank"
-      );
-
-    }
-
-
-    showMessage(
-      "Task started. Please complete it, then return here."
-    );
-
-
-    setTimeout(
-      async function() {
-
-        const confirmed =
-          confirm(
-            "Did you complete this task?"
-          );
-
-
-        if (!confirmed) {
-          return;
-        }
-
-
-        try {
-
-          const response =
-            await fetch(
-              "/api/tasks/complete",
-              {
-                method: "POST",
-
-                headers: {
-                  "Content-Type":
-                    "application/json"
-                },
-
-                body: JSON.stringify({
-
-                  telegram_id:
-                    String(user.id),
-
-                  task_id:
-                    Number(taskId)
-
-                })
-
-              }
-            );
-
-
-          const data =
-            await response.json();
-
-
-          if (!data.success) {
-
-            showMessage(
-              data.error ||
-              "Task could not be completed."
-            );
-
-            return;
-
-          }
-
-
-          document.getElementById(
-            "balance"
-          ).textContent =
-            "$" +
-            Number(
-              data.balance
-            ).toFixed(2);
-
-
-          document.getElementById(
-            "total-earned"
-          ).textContent =
-            "$" +
-            Number(
-              data.total_earned
-            ).toFixed(2);
-
-
-          showMessage(
-            "🎉 Task completed!\n\n" +
-            "Reward: $" +
-            Number(
-              data.reward
-            ).toFixed(3)
-          );
-
-
-          loadTasks();
-
-
-        } catch (error) {
-
-          console.error(
-            "Complete task error:",
-            error
-          );
-
-
-          showMessage(
-            "Connection error. Please try again."
-          );
-
-        }
-
-      },
-      3000
-    );
-
-  }
-
-
-  // DAILY BONUS
-
-  async function claimDailyBonus() {
-
-    const user =
-      tg.initDataUnsafe &&
-      tg.initDataUnsafe.user;
-
-
-    if (!user) {
-
-      showMessage(
-        "Telegram user not found."
-      );
-
-      return;
-
-    }
-
-
-    try {
-
-      const response =
-        await fetch(
-          "/api/daily-bonus",
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-
-            body: JSON.stringify({
-
-              telegram_id:
-                String(user.id)
-
-            })
-
-          }
-        );
-
-
-      const data =
-        await response.json();
-
-
-      if (!data.success) {
-
-        showMessage(
-          data.error ||
-          "Daily bonus unavailable."
-        );
-
-        return;
-
-      }
-
-
-      document.getElementById(
-        "balance"
-      ).textContent =
-        "$" +
-        Number(
-          data.balance
-        ).toFixed(2);
-
-
-      document.getElementById(
-        "total-earned"
-      ).textContent =
-        "$" +
-        Number(
-          data.total_earned
-        ).toFixed(2);
-
-
-      showMessage(
-        "🎉 Daily Bonus Claimed!\n\n" +
-        "Reward: $" +
-        Number(
-          data.reward
-        ).toFixed(2)
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        "Daily bonus error:",
-        error
-      );
-
-
-      showMessage(
-        "Connection error. Please try again."
-      );
-
-    }
-
-  }
-
-
-  // START
-
-  loadUser();
-  loadTasks();
-
-</script>
-
-</body>
-</html>
+   
