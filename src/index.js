@@ -206,6 +206,96 @@ if (url.pathname === "/api/tasks/complete" && request.method === "POST") {
     );
   }
 }
+    // Claim Daily Bonus
+if (url.pathname === "/api/daily-bonus" && request.method === "POST") {
+  try {
+    const data = await request.json();
+    const telegramId = String(data.telegram_id || "");
+
+    if (!telegramId) {
+      return Response.json(
+        {
+          success: false,
+          error: "Telegram user not found"
+        },
+        { status: 400 }
+      );
+    }
+
+    // Today's date
+    const today = new Date().toISOString().slice(0, 10);
+
+    // Check if today's bonus was already claimed
+    const alreadyClaimed = await env.DB
+      .prepare(`
+        SELECT id
+        FROM daily_bonus_claims
+        WHERE telegram_id = ?
+        AND claim_date = ?
+      `)
+      .bind(telegramId, today)
+      .first();
+
+    if (alreadyClaimed) {
+      return Response.json({
+        success: false,
+        error: "Daily bonus already claimed today"
+      }, { status: 400 });
+    }
+
+    // Daily bonus amount
+    const reward = 0.01;
+
+    // Save claim
+    await env.DB
+      .prepare(`
+        INSERT INTO daily_bonus_claims
+        (telegram_id, reward, claim_date)
+        VALUES (?, ?, ?)
+      `)
+      .bind(telegramId, reward, today)
+      .run();
+
+    // Add reward to user balance
+    await env.DB
+      .prepare(`
+        UPDATE users
+        SET
+          balance = balance + ?,
+          total_earned = total_earned + ?,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE telegram_id = ?
+      `)
+      .bind(reward, reward, telegramId)
+      .run();
+
+    // Get updated balance
+    const user = await env.DB
+      .prepare(`
+        SELECT balance, total_earned
+        FROM users
+        WHERE telegram_id = ?
+      `)
+      .bind(telegramId)
+      .first();
+
+    return Response.json({
+      success: true,
+      reward: reward,
+      balance: user.balance,
+      total_earned: user.total_earned
+    });
+
+  } catch (error) {
+    return Response.json(
+      {
+        success: false,
+        error: error.message
+      },
+      { status: 500 }
+    );
+  }
+}
     // Database test
     if (url.pathname === "/api/test") {
       const result = await env.DB
