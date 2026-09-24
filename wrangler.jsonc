@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "play2earn-miniapp",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-24",
+
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS"
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "play2earn-db",
+      "database_id": "b04fc822-d706-4d22-9c34-7d8ebd8e998a"
+    }
+  ]
+}
