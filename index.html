@@ -526,14 +526,70 @@ registerTelegramUser();async function loadTasks() {
   }
 }
 
-function openTask(url, taskId) {
+async function startTask(taskId, url) {
+  const user = tg.initDataUnsafe?.user;
+
+  if (!user) {
+    showMessage("Telegram user not found");
+    return;
+  }
+
+  // Open task link first
   if (url && url !== "#") {
     window.open(url, "_blank");
   }
 
-  console.log("Task started:", taskId);
-}
+  // Wait before allowing completion
+  setTimeout(async () => {
 
+    const confirmComplete = confirm(
+      "Did you complete this task?"
+    );
+
+    if (!confirmComplete) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/tasks/complete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          telegram_id: user.id,
+          task_id: taskId
+        })
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        alert(data.error || "Task could not be completed");
+        return;
+      }
+
+      // Update balance
+      document.getElementById("balance").textContent =
+        "$" + Number(data.balance).toFixed(2);
+
+      document.getElementById("total-earned").textContent =
+        "$" + Number(data.total_earned).toFixed(2);
+
+      alert(
+        "🎉 Task completed!\n\nReward: $" +
+        Number(data.reward).toFixed(3)
+      );
+
+      loadTasks();
+
+    } catch (error) {
+      console.error("Task completion error:", error);
+      alert("Something went wrong. Please try again.");
+    }
+
+  }, 3000);
+}
 loadTasks();</script>
 
 </body>
