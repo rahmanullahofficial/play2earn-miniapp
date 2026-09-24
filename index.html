@@ -404,7 +404,36 @@
       showMessage("Withdraw system will be connected soon.");
     }
 
-  </script>
+  async function registerTelegramUser() {
+  const user = tg.initDataUnsafe?.user;
+
+  if (!user) {
+    console.log("Telegram user not available");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ user })
+    });
+
+    const data = await response.json();
+
+    console.log("User registration:", data);
+
+    if (data.success) {
+      console.log("User saved successfully");
+    }
+  } catch (error) {
+    console.error("Registration error:", error);
+  }
+}
+
+registerTelegramUser();</script>
 
 </body>
 </html>
