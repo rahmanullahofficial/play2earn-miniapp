@@ -17,7 +17,7 @@
 
     body {
       background: #0b1020;
-      color: #fff;
+      color: white;
       min-height: 100vh;
       padding-bottom: 90px;
     }
@@ -30,13 +30,13 @@
 
     .header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       margin-bottom: 20px;
     }
 
     .logo {
-      font-size: 23px;
+      font-size: 24px;
       font-weight: 800;
     }
 
@@ -47,25 +47,23 @@
     .profile {
       width: 42px;
       height: 42px;
-      border-radius: 50%;
       background: #252d48;
+      border-radius: 50%;
       display: flex;
-      align-items: center;
       justify-content: center;
-      font-size: 20px;
+      align-items: center;
     }
 
     .balance-card {
       background: linear-gradient(135deg, #6258ff, #8b5cf6);
       border-radius: 22px;
       padding: 24px;
-      margin-bottom: 18px;
-      box-shadow: 0 12px 30px rgba(98, 88, 255, .25);
+      margin-bottom: 20px;
     }
 
     .balance-label {
-      opacity: .85;
       font-size: 14px;
+      opacity: .85;
     }
 
     .balance {
@@ -82,17 +80,15 @@
 
     .earned {
       font-size: 13px;
-      opacity: .9;
     }
 
     .withdraw-btn {
-      border: 0;
-      background: #fff;
+      border: none;
+      background: white;
       color: #6258ff;
-      padding: 11px 17px;
-      border-radius: 12px;
+      padding: 10px 15px;
+      border-radius: 10px;
       font-weight: 700;
-      cursor: pointer;
     }
 
     .section-title {
@@ -133,24 +129,25 @@
       border-radius: 17px;
       display: flex;
       align-items: center;
-      gap: 13px;
+      gap: 12px;
       margin-bottom: 10px;
     }
 
     .task-icon {
       width: 45px;
       height: 45px;
-      border-radius: 13px;
+      min-width: 45px;
       background: #202945;
+      border-radius: 13px;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       font-size: 22px;
-      flex-shrink: 0;
     }
 
     .task-info {
       flex: 1;
+      min-width: 0;
     }
 
     .task-title {
@@ -160,8 +157,8 @@
     }
 
     .task-description {
-      font-size: 11px;
       color: #8d95ad;
+      font-size: 11px;
       margin-bottom: 5px;
     }
 
@@ -172,7 +169,7 @@
     }
 
     .start-btn {
-      border: 0;
+      border: none;
       background: #6258ff;
       color: white;
       padding: 9px 13px;
@@ -180,10 +177,11 @@
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-      flex-shrink: 0;
     }
 
-    .start-btn:active {
+    .start-btn:active,
+    .quick:active,
+    .withdraw-btn:active {
       transform: scale(.96);
     }
 
@@ -220,12 +218,12 @@
       transform: translateX(-50%);
       width: 100%;
       max-width: 600px;
-      background: rgba(15, 20, 37, .97);
+      background: rgba(15,20,37,.98);
       border-top: 1px solid #222b45;
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       padding: 10px 5px;
-      z-index: 10;
+      z-index: 100;
     }
 
     .nav-item {
@@ -245,6 +243,12 @@
       color: #746cff;
     }
 
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #8d95ad;
+    }
+
     @media (max-width: 380px) {
       .quick-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -259,351 +263,508 @@
 
 <body>
 
-  <div class="app">
+<div class="app">
 
-    <div class="header">
-      <div class="logo">Play<span>2Earn</span></div>
-      <div class="profile">👤</div>
+  <div class="header">
+    <div class="logo">Play<span>2Earn</span></div>
+    <div class="profile">👤</div>
+  </div>
+
+
+  <!-- BALANCE -->
+
+  <div class="balance-card">
+
+    <div class="balance-label">
+      Available Balance
     </div>
 
-    <div class="balance-card">
-      <div class="balance-label">Available Balance</div>
-
-      <div class="balance" id="balance">$0.00</div>
-
-      <div class="balance-bottom">
-        <div class="earned">
-          Total Earned: <b id="total-earned">$0.00</b>
-        </div>
-
-        <button class="withdraw-btn" onclick="openWithdraw()">
-          Withdraw
-        </button>
-      </div>
+    <div class="balance" id="balance">
+      $0.00
     </div>
 
-    <div class="section-title">Quick Actions</div>
+    <div class="balance-bottom">
 
-    <div class="quick-grid">
-
-      <div class="quick" onclick="showMessage('Tasks')">
-        <div class="quick-icon">🎯</div>
-        <div class="quick-text">Tasks</div>
+      <div class="earned">
+        Total Earned:
+        <b id="total-earned">$0.00</b>
       </div>
 
-      <div class="quick" onclick="showMessage('Games')">
-        <div class="quick-icon">🎮</div>
-        <div class="quick-text">Games</div>
-      </div>
+      <button
+        class="withdraw-btn"
+        onclick="openWithdraw()">
+        Withdraw
+      </button>
 
-      <div class="quick" onclick="showMessage('Referral')">
-        <div class="quick-icon">👥</div>
-        <div class="quick-text">Referral</div>
-      </div>
-
-      <div class="quick" onclick="claimDailyBonus()">
-  <div class="quick-icon">🎁</div>
-  <div class="quick-text">Daily Bonus</div>
-      </div>
-
-    </div>
-
-    <div class="section-title">Featured Tasks</div>
-
-    <div id="task-list">
-
-      <div class="task">
-        <div class="task-icon">⏳</div>
-
-        <div class="task-info">
-          <div class="task-title">Loading Tasks...</div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="section-title">🔥 Daily Streak</div>
-
-    <div class="streak">
-
-      <div>
-        Keep your streak alive and earn more rewards!
-      </div>
-
-      <div class="days">
-        <div class="day active">1<br>🔥</div>
-        <div class="day">2<br>🎁</div>
-        <div class="day">3<br>🎁</div>
-        <div class="day">4<br>🎁</div>
-        <div class="day">5<br>🎁</div>
-        <div class="day">6<br>🎁</div>
-        <div class="day">7<br>💎</div>
-      </div>
-
-    </div>
-
-    <div class="section-title">🏆 Leaderboard</div>
-
-    <div class="task">
-      <div class="task-icon">🥇</div>
-
-      <div class="task-info">
-        <div class="task-title">Top Earner</div>
-        <div class="reward">$0.00 earned</div>
-      </div>
     </div>
 
   </div>
 
-  <div class="bottom-nav">
 
-    <div class="nav-item active" onclick="showMessage('Home')">
-      <span class="nav-icon">🏠</span>
-      Home
+  <!-- QUICK ACTIONS -->
+
+  <div class="section-title">
+    Quick Actions
+  </div>
+
+  <div class="quick-grid">
+
+    <div
+      class="quick"
+      onclick="scrollToTasks()">
+
+      <div class="quick-icon">🎯</div>
+      <div class="quick-text">Tasks</div>
+
     </div>
 
-    <div class="nav-item" onclick="showMessage('Tasks')">
-      <span class="nav-icon">🎯</span>
-      Tasks
+
+    <div
+      class="quick"
+      onclick="showMessage('Games coming soon 🎮')">
+
+      <div class="quick-icon">🎮</div>
+      <div class="quick-text">Games</div>
+
     </div>
 
-    <div class="nav-item" onclick="showMessage('Games')">
-      <span class="nav-icon">🎮</span>
-      Games
+
+    <div
+      class="quick"
+      onclick="showMessage('Referral system coming soon 👥')">
+
+      <div class="quick-icon">👥</div>
+      <div class="quick-text">Referral</div>
+
     </div>
 
-    <div class="nav-item" onclick="showMessage('Referral')">
-      <span class="nav-icon">👥</span>
-      Referral
-    </div>
 
-    <div class="nav-item" onclick="showMessage('Profile')">
-      <span class="nav-icon">👤</span>
-      Profile
+    <div
+      class="quick"
+      onclick="claimDailyBonus()">
+
+      <div class="quick-icon">🎁</div>
+      <div class="quick-text">Daily Bonus</div>
+
     </div>
 
   </div>
 
-  <script>
 
-    const tg = window.Telegram.WebApp;
+  <!-- TASKS -->
 
-    tg.ready();
-    tg.expand();
+  <div
+    class="section-title"
+    id="tasks-section">
+
+    Featured Tasks
+
+  </div>
+
+  <div id="task-list">
+
+    <div class="loading">
+      Loading Tasks...
+    </div>
+
+  </div>
 
 
-    // Show Telegram message
-    function showMessage(message) {
-      if (tg.showAlert) {
-        tg.showAlert(message);
-      } else {
-        alert(message);
-      }
+  <!-- STREAK -->
+
+  <div class="section-title">
+    🔥 Daily Streak
+  </div>
+
+  <div class="streak">
+
+    <div>
+      Keep your streak alive and earn more rewards!
+    </div>
+
+    <div class="days">
+
+      <div class="day active">
+        1<br>🔥
+      </div>
+
+      <div class="day">
+        2<br>🎁
+      </div>
+
+      <div class="day">
+        3<br>🎁
+      </div>
+
+      <div class="day">
+        4<br>🎁
+      </div>
+
+      <div class="day">
+        5<br>🎁
+      </div>
+
+      <div class="day">
+        6<br>🎁
+      </div>
+
+      <div class="day">
+        7<br>💎
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- LEADERBOARD -->
+
+  <div class="section-title">
+    🏆 Leaderboard
+  </div>
+
+  <div class="task">
+
+    <div class="task-icon">
+      🥇
+    </div>
+
+    <div class="task-info">
+
+      <div class="task-title">
+        Top Earner
+      </div>
+
+      <div class="reward">
+        $0.00 earned
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- BOTTOM NAV -->
+
+<div class="bottom-nav">
+
+  <div
+    class="nav-item active"
+    onclick="window.scrollTo({top:0,behavior:'smooth'})">
+
+    <span class="nav-icon">🏠</span>
+    Home
+
+  </div>
+
+
+  <div
+    class="nav-item"
+    onclick="scrollToTasks()">
+
+    <span class="nav-icon">🎯</span>
+    Tasks
+
+  </div>
+
+
+  <div
+    class="nav-item"
+    onclick="showMessage('Games coming soon 🎮')">
+
+    <span class="nav-icon">🎮</span>
+    Games
+
+  </div>
+
+
+  <div
+    class="nav-item"
+    onclick="showMessage('Referral system coming soon 👥')">
+
+    <span class="nav-icon">👥</span>
+    Referral
+
+  </div>
+
+
+  <div
+    class="nav-item"
+    onclick="showMessage('Profile coming soon 👤')">
+
+    <span class="nav-icon">👤</span>
+    Profile
+
+  </div>
+
+</div>
+
+
+<script>
+
+  const tg = window.Telegram.WebApp;
+
+  tg.ready();
+  tg.expand();
+
+
+  // MESSAGE
+
+  function showMessage(message) {
+
+    if (
+      tg &&
+      typeof tg.showAlert === "function"
+    ) {
+
+      tg.showAlert(message);
+
+    } else {
+
+      alert(message);
+
     }
 
-
-    // Withdraw
-    function openWithdraw() async function claimDailyBonus() {
-
-  const user = tg.initDataUnsafe?.user;
-
-  if (!user) {
-    showMessage("Telegram user not found");
-    return;
   }
 
-  try {
 
-    const response = await fetch("/api/daily-bonus", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        telegram_id: user.id
-      })
-    });
+  // WITHDRAW
 
-    const data = await response.json();
+  function openWithdraw() {
 
-    if (!data.success) {
+    showMessage(
+      "Withdraw system will be connected soon."
+    );
 
-      showMessage(
-        data.error || "Daily bonus could not be claimed"
+  }
+
+
+  // SCROLL TO TASKS
+
+  function scrollToTasks() {
+
+    const section =
+      document.getElementById(
+        "tasks-section"
+      );
+
+    if (section) {
+
+      section.scrollIntoView({
+        behavior: "smooth"
+      });
+
+    }
+
+  }
+
+
+  // LOAD USER
+
+  async function loadUser() {
+
+    const user =
+      tg.initDataUnsafe &&
+      tg.initDataUnsafe.user;
+
+    if (!user) {
+
+      console.log(
+        "Telegram user not available"
       );
 
       return;
-    }
 
-    // Update balance
-    document.getElementById("balance").textContent =
-      "$" + Number(data.balance).toFixed(2);
-
-    // Update total earned
-    document.getElementById("total-earned").textContent =
-      "$" + Number(data.total_earned).toFixed(2);
-
-    showMessage(
-      "🎉 Daily Bonus Claimed!\n\n" +
-      "Reward: $" +
-      Number(data.reward).toFixed(2)
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Daily bonus error:",
-      error
-    );
-
-    showMessage(
-      "Something went wrong. Please try again."
-    );
-  }
-    } {
-      showMessage("Withdraw system will be connected soon.");
     }
 
 
-    // Register Telegram user and load balance
-    async function registerTelegramUser() {
+    try {
 
-      const user = tg.initDataUnsafe?.user;
+      // Register
 
-      if (!user) {
-        console.log("Telegram user not available");
-        return;
-      }
+      const registerResponse =
+        await fetch(
+          "/api/user",
+          {
+            method: "POST",
 
-      try {
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
 
-        const registerResponse = await fetch("/api/user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            user: user
-          })
-        });
-
-        const registerData = await registerResponse.json();
-
-        if (!registerData.success) {
-          console.error(
-            "Registration error:",
-            registerData.error
-          );
-          return;
-        }
-
-
-        const response = await fetch(
-          "/api/user?telegram_id=" +
-          encodeURIComponent(user.id)
+            body: JSON.stringify({
+              user: user
+            })
+          }
         );
 
-        const data = await response.json();
 
-        if (data.success) {
-
-          const balance =
-            Number(data.user.balance || 0);
-
-          const totalEarned =
-            Number(data.user.total_earned || 0);
+      const registerData =
+        await registerResponse.json();
 
 
-          document.getElementById("balance").textContent =
-            "$" + balance.toFixed(2);
-
-
-          document.getElementById("total-earned").textContent =
-            "$" + totalEarned.toFixed(2);
-
-
-          console.log(
-            "User data loaded:",
-            data.user
-          );
-        }
-
-      } catch (error) {
+      if (!registerData.success) {
 
         console.error(
-          "User loading error:",
-          error
+          registerData.error
         );
 
+        return;
+
       }
+
+
+      // Get user
+
+      const response =
+        await fetch(
+          "/api/user?telegram_id=" +
+          encodeURIComponent(
+            user.id
+          )
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (
+        data.success &&
+        data.user
+      ) {
+
+        document.getElementById(
+          "balance"
+        ).textContent =
+          "$" +
+          Number(
+            data.user.balance || 0
+          ).toFixed(2);
+
+
+        document.getElementById(
+          "total-earned"
+        ).textContent =
+          "$" +
+          Number(
+            data.user.total_earned || 0
+          ).toFixed(2);
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        "User error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  // LOAD TASKS
+
+  async function loadTasks() {
+
+    const container =
+      document.getElementById(
+        "task-list"
+      );
+
+
+    if (!container) {
+      return;
     }
 
 
-    // Load tasks from database
-    async function loadTasks() {
+    try {
 
-      try {
-
-        const response =
-          await fetch("/api/tasks");
-
-        const data =
-          await response.json();
+      const response =
+        await fetch(
+          "/api/tasks"
+        );
 
 
-        if (!data.success) {
-
-          console.error(
-            "Tasks error:",
-            data.error
-          );
-
-          return;
-        }
+      const data =
+        await response.json();
 
 
-        const container =
-          document.getElementById("task-list");
+      console.log(
+        "Tasks API:",
+        data
+      );
 
 
-        if (!container) {
-          return;
-        }
+      if (
+        !data.success
+      ) {
 
-
-        container.innerHTML = "";
-
-
-        if (!data.tasks || data.tasks.length === 0) {
-
-          container.innerHTML = `
-            <div class="task">
-              <div class="task-icon">📭</div>
-              <div class="task-info">
-                <div class="task-title">
-                  No tasks available
-                </div>
+        container.innerHTML = `
+          <div class="task">
+            <div class="task-icon">⚠️</div>
+            <div class="task-info">
+              <div class="task-title">
+                Could not load tasks
               </div>
             </div>
-          `;
+          </div>
+        `;
 
-          return;
-        }
+        return;
+
+      }
 
 
-        data.tasks.forEach(task => {
+      container.innerHTML = "";
 
-          const taskDiv =
-            document.createElement("div");
 
-          taskDiv.className = "task";
+      if (
+        !data.tasks ||
+        data.tasks.length === 0
+      ) {
+
+        container.innerHTML = `
+          <div class="task">
+            <div class="task-icon">📭</div>
+            <div class="task-info">
+              <div class="task-title">
+                No tasks available
+              </div>
+            </div>
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      data.tasks.forEach(
+        function(task) {
+
+          const div =
+            document.createElement(
+              "div"
+            );
+
+
+          div.className =
+            "task";
 
 
           const reward =
-            Number(task.reward || 0);
+            Number(
+              task.reward || 0
+            );
 
 
-          taskDiv.innerHTML = `
+          div.innerHTML = `
 
             <div class="task-icon">
               ${task.icon || "🎯"}
@@ -612,11 +773,13 @@
             <div class="task-info">
 
               <div class="task-title">
-                ${task.title}
+                ${escapeHtml(task.title)}
               </div>
 
               <div class="task-description">
-                ${task.description || ""}
+                ${escapeHtml(
+                  task.description || ""
+                )}
               </div>
 
               <div class="reward">
@@ -627,68 +790,133 @@
 
             <button
               class="start-btn"
-              onclick="startTask(${task.id}, '${task.url || "#"}')"
-            >
+              onclick="startTask(
+                ${Number(task.id)},
+                '${String(
+                  task.url || "#"
+                ).replace(/'/g, "\\'")}'
+              )">
+
               Start
+
             </button>
 
           `;
 
 
-          container.appendChild(taskDiv);
+          container.appendChild(
+            div
+          );
 
-        });
+        }
+      );
 
 
-      } catch (error) {
+    } catch (error) {
 
-        console.error(
-          "Task loading error:",
-          error
-        );
+      console.error(
+        "Tasks error:",
+        error
+      );
 
-      }
+
+      container.innerHTML = `
+        <div class="task">
+          <div class="task-icon">⚠️</div>
+          <div class="task-info">
+            <div class="task-title">
+              Connection error
+            </div>
+          </div>
+        </div>
+      `;
+
+    }
+
+  }
+
+
+  // SAFE TEXT
+
+  function escapeHtml(text) {
+
+    return String(text)
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+      .replace(
+        /</g,
+        "&lt;"
+      )
+      .replace(
+        />/g,
+        "&gt;"
+      )
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+      .replace(
+        /'/g,
+        "&#039;"
+      );
+
+  }
+
+
+  // COMPLETE TASK
+
+  async function startTask(
+    taskId,
+    taskUrl
+  ) {
+
+    const user =
+      tg.initDataUnsafe &&
+      tg.initDataUnsafe.user;
+
+
+    if (!user) {
+
+      showMessage(
+        "Telegram user not found."
+      );
+
+      return;
+
     }
 
 
-    // Start task
-    async function startTask(taskId, url) {
+    // For now task URLs are #
+    if (
+      taskUrl &&
+      taskUrl !== "#"
+    ) {
 
-      const user =
-        tg.initDataUnsafe?.user;
+      window.open(
+        taskUrl,
+        "_blank"
+      );
 
-
-      if (!user) {
-
-        showMessage(
-          "Telegram user not found"
-        );
-
-        return;
-      }
+    }
 
 
-      // Open task link
-      if (url && url !== "#") {
-
-        window.open(
-          url,
-          "_blank"
-        );
-
-      }
+    showMessage(
+      "Task started. Please complete it, then return here."
+    );
 
 
-      // Wait 3 seconds
-      setTimeout(async () => {
+    setTimeout(
+      async function() {
 
-        const completed =
+        const confirmed =
           confirm(
             "Did you complete this task?"
           );
 
 
-        if (!completed) {
+        if (!confirmed) {
           return;
         }
 
@@ -707,9 +935,15 @@
                 },
 
                 body: JSON.stringify({
-                  telegram_id: user.id,
-                  task_id: taskId
+
+                  telegram_id:
+                    String(user.id),
+
+                  task_id:
+                    Number(taskId)
+
                 })
+
               }
             );
 
@@ -722,14 +956,14 @@
 
             showMessage(
               data.error ||
-              "Task could not be completed"
+              "Task could not be completed."
             );
 
             return;
+
           }
 
 
-          // Update balance
           document.getElementById(
             "balance"
           ).textContent =
@@ -739,7 +973,6 @@
             ).toFixed(2);
 
 
-          // Update total earned
           document.getElementById(
             "total-earned"
           ).textContent =
@@ -750,41 +983,148 @@
 
 
           showMessage(
-            "🎉 Task completed!\n\nReward: $" +
+            "🎉 Task completed!\n\n" +
+            "Reward: $" +
             Number(
               data.reward
             ).toFixed(3)
           );
 
 
-          // Reload tasks
           loadTasks();
 
 
         } catch (error) {
 
           console.error(
-            "Task completion error:",
+            "Complete task error:",
             error
           );
 
 
           showMessage(
-            "Something went wrong. Please try again."
+            "Connection error. Please try again."
           );
 
         }
 
-      }, 3000);
+      },
+      3000
+    );
+
+  }
+
+
+  // DAILY BONUS
+
+  async function claimDailyBonus() {
+
+    const user =
+      tg.initDataUnsafe &&
+      tg.initDataUnsafe.user;
+
+
+    if (!user) {
+
+      showMessage(
+        "Telegram user not found."
+      );
+
+      return;
 
     }
 
 
-    // Start app
-    registerTelegramUser();
-    loadTasks();
+    try {
 
-  </script>
+      const response =
+        await fetch(
+          "/api/daily-bonus",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+
+              telegram_id:
+                String(user.id)
+
+            })
+
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.success) {
+
+        showMessage(
+          data.error ||
+          "Daily bonus unavailable."
+        );
+
+        return;
+
+      }
+
+
+      document.getElementById(
+        "balance"
+      ).textContent =
+        "$" +
+        Number(
+          data.balance
+        ).toFixed(2);
+
+
+      document.getElementById(
+        "total-earned"
+      ).textContent =
+        "$" +
+        Number(
+          data.total_earned
+        ).toFixed(2);
+
+
+      showMessage(
+        "🎉 Daily Bonus Claimed!\n\n" +
+        "Reward: $" +
+        Number(
+          data.reward
+        ).toFixed(2)
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Daily bonus error:",
+        error
+      );
+
+
+      showMessage(
+        "Connection error. Please try again."
+      );
+
+    }
+
+  }
+
+
+  // START
+
+  loadUser();
+  loadTasks();
+
+</script>
 
 </body>
 </html>
