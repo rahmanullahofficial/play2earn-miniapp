@@ -49,21 +49,112 @@ export default {
         const firstName = user.first_name || "";
         const lastName = user.last_name || "";
 
-        const existing = await env.DB
-          .prepare(
-            "SELECT * FROM users WHERE telegram_id = ?"
-          )
+        /*
+          Telegram Mini App referral parameter.
+
+          Example:
+          https://t.me/Play2Earn_Free_bot?startapp=P2E1813521459
+        */
+
+        const startParam = String(
+          data.start_param ||
+          data.startapp ||
+          ""
+        ).trim();
+
+
+        /*
+          Find existing user
+        */
+
+        let existing = await env.DB
+          .prepare(`
+            SELECT *
+            FROM users
+            WHERE telegram_id = ?
+          `)
           .bind(telegramId)
           .first();
+
+
+        /*
+          Find referrer
+        */
+
+        let referrer = null;
+
+        if (startParam) {
+
+          /*
+            First:
+            Search complete referral code
+          */
+
+          referrer = await env.DB
+            .prepare(`
+              SELECT telegram_id
+              FROM users
+              WHERE referral_code = ?
+            `)
+            .bind(startParam)
+            .first();
+
+
+          /*
+            Second:
+            Support simple referral code:
+
+            P2E + Telegram ID
+
+            Example:
+            P2E1813521459
+          */
+
+          if (
+            !referrer &&
+            startParam.startsWith("P2E")
+          ) {
+
+            const possibleTelegramId =
+              startParam.substring(3);
+
+            if (possibleTelegramId) {
+
+              referrer = await env.DB
+                .prepare(`
+                  SELECT telegram_id
+                  FROM users
+                  WHERE telegram_id = ?
+                `)
+                .bind(possibleTelegramId)
+                .first();
+
+            }
+          }
+
+
+          /*
+            Prevent self-referral
+          */
+
+          if (
+            referrer &&
+            String(referrer.telegram_id) === telegramId
+          ) {
+            referrer = null;
+          }
+        }
+
+
+        // =========================
+        // NEW USER
+        // =========================
 
         if (!existing) {
 
           /*
             New referral code:
             P2E + Telegram ID
-
-            Example:
-            P2E1813521459
           */
 
           const referralCode =
@@ -71,77 +162,9 @@ export default {
 
           let referredBy = null;
 
-          /*
-            Telegram Mini App start parameter.
-
-            Example:
-            https://t.me/Play2Earn_Free_bot?startapp=P2E1813521459
-          */
-
-          const startParam =
-            String(data.start_param || "").trim();
-
-          if (startParam) {
-
-            let referrer = null;
-
-            /*
-              First check the complete referral_code
-            */
-
-            referrer = await env.DB
-              .prepare(`
-                SELECT telegram_id
-                FROM users
-                WHERE referral_code = ?
-              `)
-              .bind(startParam)
-              .first();
-
-
-            /*
-              Also support referral links like:
-
-              P2E1813521459
-
-              This is useful for the new
-              simplified referral system.
-            */
-
-            if (
-              !referrer &&
-              startParam.startsWith("P2E")
-            ) {
-
-              const possibleTelegramId =
-                startParam.substring(3);
-
-              if (possibleTelegramId) {
-
-                referrer = await env.DB
-                  .prepare(`
-                    SELECT telegram_id
-                    FROM users
-                    WHERE telegram_id = ?
-                  `)
-                  .bind(possibleTelegramId)
-                  .first();
-
-              }
-            }
-
-
-            /*
-              Do not allow self-referral.
-            */
-
-            if (
-              referrer &&
-              String(referrer.telegram_id) !== telegramId
-            ) {
-              referredBy =
-                String(referrer.telegram_id);
-            }
+          if (referrer) {
+            referredBy =
+              String(referrer.telegram_id);
           }
 
 
@@ -179,8 +202,8 @@ export default {
 
 
           /*
-            Give referral reward only once,
-            when a completely new user joins.
+            Give referral reward
+            only for a new referred user
           */
 
           if (referredBy) {
@@ -190,7 +213,7 @@ export default {
 
             /*
               Increase referrer's
-              referral count.
+              referral count
             */
 
             await env.DB
@@ -199,22 +222,6 @@ export default {
                 SET
                   referrals_count =
                     referrals_count + 1,
-                  updated_at =
-                    CURRENT_TIMESTAMP
-                WHERE telegram_id = ?
-              `)
-              .bind(referredBy)
-              .run();
-
-
-            /*
-              Give $0.01 referral reward.
-            */
-
-            await env.DB
-              .prepare(`
-                UPDATE users
-                SET
                   balance =
                     balance + ?,
                   total_earned =
@@ -234,7 +241,7 @@ export default {
 
 
             /*
-              Update referrer's level.
+              Update referrer's level
             */
 
             await updateLevel(
@@ -244,7 +251,7 @@ export default {
 
 
             /*
-              Save referral transaction.
+              Save referral transaction
             */
 
             await env.DB
@@ -266,11 +273,15 @@ export default {
               .run();
           }
 
+
+        // =========================
+        // EXISTING USER
+        // =========================
+
         } else {
 
           /*
-            Existing user:
-            update Telegram profile information only.
+            Update Telegram profile
           */
 
           await env.DB
@@ -290,19 +301,171 @@ export default {
               telegramId
             )
             .run();
+
+
+          /*
+            Keep referral code
+            in the simple format:
+
+            P2E + Telegram ID
+          */
+
+          const simpleReferralCode =
+            "P2E" + telegramId;
+
+          await env.DB
+            .prepare(`
+              UPDATE users
+              SET
+                referral_code = ?,
+                updated_at = CURRENT_TIMESTAMP
+              WHERE telegram_id = ?
+            `)
+            .bind(
+              simpleReferralCode,
+              telegramId
+            )
+            .run();
+
+
+          /*
+            IMPORTANT:
+
+            If this user was previously
+            created WITHOUT a referral,
+            try to attach the referral now.
+          */
+
+          if (
+            referrer &&
+            (
+              existing.referred_by === null ||
+              existing.referred_by === ""
+            )
+          ) {
+
+            const referredBy =
+              String(referrer.telegram_id);
+
+            const referralReward = 0.01;
+
+
+            /*
+              Attach referral only if
+              referred_by is still empty.
+
+              This prevents duplicate rewards.
+            */
+
+            const referralUpdate =
+              await env.DB
+                .prepare(`
+                  UPDATE users
+                  SET
+                    referred_by = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                  WHERE telegram_id = ?
+                  AND (
+                    referred_by IS NULL
+                    OR referred_by = ''
+                  )
+                `)
+                .bind(
+                  referredBy,
+                  telegramId
+                )
+                .run();
+
+
+            /*
+              Reward only when referral
+              was successfully attached.
+            */
+
+            if (
+              Number(
+                referralUpdate.meta?.changes || 0
+              ) === 1
+            ) {
+
+              /*
+                Increase referrer's count
+              */
+
+              await env.DB
+                .prepare(`
+                  UPDATE users
+                  SET
+                    referrals_count =
+                      referrals_count + 1,
+                    balance =
+                      balance + ?,
+                    total_earned =
+                      total_earned + ?,
+                    xp =
+                      xp + 10,
+                    updated_at =
+                      CURRENT_TIMESTAMP
+                  WHERE telegram_id = ?
+                `)
+                .bind(
+                  referralReward,
+                  referralReward,
+                  referredBy
+                )
+                .run();
+
+
+              /*
+                Update referrer's level
+              */
+
+              await updateLevel(
+                env.DB,
+                referredBy
+              );
+
+
+              /*
+                Save referral transaction
+              */
+
+              await env.DB
+                .prepare(`
+                  INSERT INTO transactions
+                  (
+                    telegram_id,
+                    type,
+                    amount,
+                    description
+                  )
+                  VALUES (?, 'referral', ?, ?)
+                `)
+                .bind(
+                  referredBy,
+                  referralReward,
+                  "Referral reward"
+                )
+                .run();
+            }
+          }
         }
 
 
         /*
-          Get final user data.
+          Get final user data
         */
 
-        const finalUser = await env.DB
-          .prepare(
-            "SELECT * FROM users WHERE telegram_id = ?"
-          )
-          .bind(telegramId)
-          .first();
+        const finalUser =
+          await env.DB
+            .prepare(`
+              SELECT *
+              FROM users
+              WHERE telegram_id = ?
+            `)
+            .bind(telegramId)
+            .first();
+
 
         return json({
           success: true,
@@ -937,6 +1100,36 @@ export default {
           );
         }
 
+
+        /*
+          Always use the simple referral code:
+
+          P2E + Telegram ID
+        */
+
+        const referralCode =
+          "P2E" + String(user.telegram_id);
+
+
+        /*
+          Update database referral code
+        */
+
+        await env.DB
+          .prepare(`
+            UPDATE users
+            SET
+              referral_code = ?,
+              updated_at = CURRENT_TIMESTAMP
+            WHERE telegram_id = ?
+          `)
+          .bind(
+            referralCode,
+            String(telegramId)
+          )
+          .run();
+
+
         const botUsername =
           "Play2Earn_Free_bot";
 
@@ -945,8 +1138,9 @@ export default {
           botUsername +
           "?startapp=" +
           encodeURIComponent(
-            user.referral_code
+            referralCode
           );
+
 
         const earned =
           await env.DB
@@ -963,14 +1157,27 @@ export default {
             .bind(String(telegramId))
             .first();
 
+
+        const updatedUser =
+          await env.DB
+            .prepare(`
+              SELECT
+                referrals_count
+              FROM users
+              WHERE telegram_id = ?
+            `)
+            .bind(String(telegramId))
+            .first();
+
+
         return json({
           success: true,
           referral: {
             link,
             referral_code:
-              user.referral_code,
+              referralCode,
             referrals_count:
-              user.referrals_count || 0,
+              updatedUser?.referrals_count || 0,
             earned:
               earned?.earned || 0
           }
